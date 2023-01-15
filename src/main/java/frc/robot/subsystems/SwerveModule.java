@@ -1,7 +1,7 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.TalonFXSensorCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -12,60 +12,115 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 
 public class SwerveModule {
     private final WPI_TalonFX m_driveMotor;
     private final CANSparkMax m_turningMotor;
-  
-    private final WPI_CANCoder m_turningEncoder;
-  
-    private final PIDController m_drivePIDController =
-        new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
 
-    private final ProfiledPIDController m_turningPIDController =
-      new ProfiledPIDController(
-          ModuleConstants.kPModuleTurningController,
-          0,
-          0,
-          new TrapezoidProfile.Constraints(
-              ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
-              ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
-  
+    private final WPI_CANCoder m_turningEncoder;
+
+    private final PIDController m_drivePIDController = new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
+
+    // private final ProfiledPIDController m_turningPIDController =
+    // new ProfiledPIDController(
+    // ModuleConstants.kPModuleTurningController,
+    // 0,
+    // 0,
+    // new TrapezoidProfile.Constraints(
+    // ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
+    // ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
+
+    private final PIDController m_turningPIDController = new PIDController(ModuleConstants.kPModuleTurningController, 0,
+            0);
 
     public SwerveModule(int driveMotorID, int turningMotorID, int turningEncoderID) {
+
         this.m_driveMotor = new WPI_TalonFX(driveMotorID);
 
         this.m_turningMotor = new CANSparkMax(turningMotorID, MotorType.kBrushless);
+        this.m_turningMotor.setInverted(true);
         this.m_turningEncoder = new WPI_CANCoder(turningEncoderID);
+        this.m_turningEncoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
 
-        m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
+        m_turningPIDController.enableContinuousInput(-180, 180);
+
     }
 
     public SwerveModuleState getState() {
         return new SwerveModuleState(
-            m_driveMotor.getSelectedSensorVelocity(), new Rotation2d(m_turningEncoder.getAbsolutePosition())
-        );
+                getDriveVelocity(), Rotation2d.fromDegrees(m_turningEncoder.getAbsolutePosition()));
     }
 
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
-            m_driveMotor.getSelectedSensorPosition(), new Rotation2d(m_turningEncoder.getAbsolutePosition())
-        );
+                getDrivePosition(), Rotation2d.fromDegrees(m_turningEncoder.getAbsolutePosition()));
+    }
+
+    private double getRotationsPerSecond() {
+        return (m_driveMotor.getSelectedSensorVelocity() * 10) / ModuleConstants.driveEncoderTicksPerRotation; // Data
+                                                                                                               // is
+                                                                                                               // returned
+                                                                                                               // in
+                                                                                                               // ticks
+                                                                                                               // per
+                                                                                                               // 100ms,
+                                                                                                               // multiply
+                                                                                                               // by 10
+                                                                                                               // to get
+                                                                                                               // ticks/second,
+                                                                                                               // then
+                                                                                                               // divide
+                                                                                                               // by
+                                                                                                               // ticks
+                                                                                                               // per
+                                                                                                               // rotation
+                                                                                                               // for
+                                                                                                               // rotations/second
+    }
+
+    private double getRotationsFromTicks(double ticks) {
+        return ticks / ModuleConstants.driveEncoderTicksPerRotation;
+    }
+
+    private double getDriveVelocity() {
+        return (getRotationsPerSecond() * ModuleConstants.metersPerRotation);
+    }
+
+    private double getDrivePosition() {
+        return getRotationsFromTicks(m_driveMotor.getSelectedSensorPosition()) / ModuleConstants.metersPerRotation;
     }
 
     public void setDesiredState(SwerveModuleState desiredState) {
-        SwerveModuleState state =
-            SwerveModuleState.optimize(desiredState, new Rotation2d(m_turningEncoder.getAbsolutePosition()));
+
+        SwerveModuleState state = SwerveModuleState.optimize(desiredState,
+                Rotation2d.fromDegrees(m_turningEncoder.getAbsolutePosition()));
 
         // Calculate the drive output from the drive PID controller.
-        final double driveOutput =
-            m_drivePIDController.calculate(m_driveMotor.getSelectedSensorVelocity(), state.speedMetersPerSecond);
 
-        final double turnOutput = 
-            m_turningPIDController.calculate(m_turningEncoder.getAbsolutePosition(), state.angle.getRadians());
+        double driveOutput = m_drivePIDController.calculate(getDriveVelocity(), state.speedMetersPerSecond);
 
+        final double turnOutput = m_turningPIDController.calculate(m_turningEncoder.getAbsolutePosition(),
+                state.angle.getDegrees());
         m_driveMotor.set(driveOutput);
         m_turningMotor.set(turnOutput);
+
+        // testDrive(state);
+        // testRot(state);
     }
+
+    public void testDrive(SwerveModuleState state) {
+        double driveOutput = m_drivePIDController.calculate(getDriveVelocity(), 3);
+
+        m_driveMotor.set(driveOutput);
+    }
+
+    public void testRot(SwerveModuleState state) {
+        final double turnOutput = m_turningPIDController.calculate(m_turningEncoder.getAbsolutePosition(), 0);
+
+        m_turningMotor.set(turnOutput);
+    }
+
 }

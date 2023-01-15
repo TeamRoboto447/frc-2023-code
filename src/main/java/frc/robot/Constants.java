@@ -22,19 +22,19 @@ public final class Constants {
 
   public static class DriveConstants {
     
+    public static final int kFrontRightDriveID = 11;
     public static final int kFrontLeftDriveID = 21;
     public static final int kRearLeftDriveID = 31;
-    public static final int kFrontRightDriveID = 11;
     public static final int kRearRightDriveID = 41;
 
+    public static final int kFrontRightTurningID = 12;
     public static final int kFrontLeftTurningID = 22;
     public static final int kRearLeftTurningID = 32;
-    public static final int kFrontRightTurningID = 12;
-    public static final int kRearRightTurningID = 41;
+    public static final int kRearRightTurningID = 42;
 
-    public static final int kFrontLeftTurnEncoderID = 23;
-    public static final int kRearLeftTurnEncoderID = 31;
     public static final int kFrontRightTurnEncoderID = 13;
+    public static final int kFrontLeftTurnEncoderID = 23;
+    public static final int kRearLeftTurnEncoderID = 33;
     public static final int kRearRightTurnEncoderID = 43;
 
     public static final double kTrackWidth = 24 + (3/8); // 24 and 3/8in
@@ -52,22 +52,20 @@ public final class Constants {
 
     public static final boolean kGyroReversed = false;
 
-    // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
-    // These characterization values MUST be determined either experimentally or theoretically
-    // for *your* robot's drive.
-    // The SysId tool provides a convenient method for obtaining these values for your robot.
-    // public static final double ksVolts = "Fix";
-    // public static final double kvVoltSecondsPerMeter = "Fix";
-    // public static final double kaVoltSecondsSquaredPerMeter = "Fix";
-
-    public static final double kMaxSpeedMetersPerSecond = 3;
+    public static final double kMaxSpeedMetersPerSecond = 30;
   }
 
   public static class ModuleConstants {
-    public static final double kPModuleDriveController = 1;
-    public static final double kPModuleTurningController = 1;
+    public static final double kPModuleDriveController = 0.1;
+    public static final double kPModuleTurningController = 0.01;
     public static final double kMaxModuleAngularSpeedRadiansPerSecond = 2 * Math.PI;
     public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 2 * Math.PI;
+    public static final int driveEncoderTicksPerRotation = 13848;
+    public static final double wheelDiameterMeters = 0.1016;
+    public static final double  metersPerPulse =
+        // Assumes the encoders are directly mounted on the wheel shafts, will fix this later
+        (wheelDiameterMeters * Math.PI) / (double) driveEncoderTicksPerRotation;
+    public static final double metersPerRotation = metersPerPulse * driveEncoderTicksPerRotation;
   }
 
   public static final class OIConstants {

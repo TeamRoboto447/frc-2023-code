@@ -4,14 +4,15 @@
 
 package frc.robot;
 
+import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.DriveSubsystem;
 
 import java.util.Set;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -26,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();  
+  private final PowerDistribution PDP = new PowerDistribution(0, ModuleType.kCTRE);
 
   Joystick m_driverController = new Joystick(OIConstants.kDriverControllerPort);
 
@@ -34,16 +36,26 @@ public class RobotContainer {
     configureBindings();
 
     m_robotDrive.setDefaultCommand(
-      // The left stick controls translation of the robot.
-      // Turning is controlled by the X axis of the right stick.
-      new RunCommand(
-          () ->
-              m_robotDrive.drive(
-                  m_driverController.getX(),
-                  m_driverController.getY(),
-                  m_driverController.getZ(),
-                  false),
-          m_robotDrive));
+      new RunCommand(() -> {
+        m_robotDrive.drive(
+                 deadzoneXY( -m_driverController.getX(), 0.01),
+                 deadzoneXY( m_driverController.getY(), 0.01),
+                 deadzoneROT( -m_driverController.getZ(), 0.01),
+                true);
+
+      }, m_robotDrive));
+    
+    PDP.getModule();
+  }
+
+  private double deadzoneXY(double val, double deadzone) {
+    if(Math.abs(deadzone) > Math.abs(val)) return 0;
+    else return val * 5;
+  }
+
+  private double deadzoneROT(double val, double deadzone) {
+    if(Math.abs(deadzone) > Math.abs(val)) return 0;
+    else return val / 5;
   }
 
   /**
