@@ -4,21 +4,20 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 
 public class SwerveModule {
-    private final WPI_TalonFX m_driveMotor;
+    private final CANSparkMax m_driveMotor;
     private final CANSparkMax m_turningMotor;
+
+    private final RelativeEncoder m_driveEncoder;
 
     private final WPI_CANCoder m_turningEncoder;
 
@@ -38,7 +37,8 @@ public class SwerveModule {
 
     public SwerveModule(int driveMotorID, int turningMotorID, int turningEncoderID) {
 
-        this.m_driveMotor = new WPI_TalonFX(driveMotorID);
+        this.m_driveMotor = new CANSparkMax(driveMotorID, MotorType.kBrushless);
+        this.m_driveEncoder = m_driveMotor.getEncoder();
 
         this.m_turningMotor = new CANSparkMax(turningMotorID, MotorType.kBrushless);
         this.m_turningMotor.setInverted(true);
@@ -60,29 +60,7 @@ public class SwerveModule {
     }
 
     private double getRotationsPerSecond() {
-        return (m_driveMotor.getSelectedSensorVelocity() * 10) / ModuleConstants.driveEncoderTicksPerRotation; // Data
-                                                                                                               // is
-                                                                                                               // returned
-                                                                                                               // in
-                                                                                                               // ticks
-                                                                                                               // per
-                                                                                                               // 100ms,
-                                                                                                               // multiply
-                                                                                                               // by 10
-                                                                                                               // to get
-                                                                                                               // ticks/second,
-                                                                                                               // then
-                                                                                                               // divide
-                                                                                                               // by
-                                                                                                               // ticks
-                                                                                                               // per
-                                                                                                               // rotation
-                                                                                                               // for
-                                                                                                               // rotations/second
-    }
-
-    private double getRotationsFromTicks(double ticks) {
-        return ticks / ModuleConstants.driveEncoderTicksPerRotation;
+        return m_driveEncoder.getVelocity() * 60; // RelativeEncoder returns velocity in RPM, convert to RPS
     }
 
     private double getDriveVelocity() {
@@ -90,7 +68,7 @@ public class SwerveModule {
     }
 
     private double getDrivePosition() {
-        return getRotationsFromTicks(m_driveMotor.getSelectedSensorPosition()) / ModuleConstants.metersPerRotation;
+        return m_driveEncoder.getPosition() / ModuleConstants.metersPerRotation;
     }
 
     public void setDesiredState(SwerveModuleState desiredState) {
