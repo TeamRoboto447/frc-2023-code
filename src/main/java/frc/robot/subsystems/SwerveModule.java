@@ -109,16 +109,9 @@ public class SwerveModule {
         m_turningMotor.set(turnOutput);
     }
 
-    public void testDrive(SwerveModuleState state) {
-        double driveOutput = m_drivePIDController.calculate(getDriveVelocity(), 3);
-
-        m_driveMotor.set(driveOutput);
-    }
-
-    public void testRot(SwerveModuleState state) {
-        final double turnOutput = m_turningPIDController.calculate(m_turningEncoder.getAbsolutePosition(), 0);
-
-        m_turningMotor.set(turnOutput);
+    public void stop() {
+        m_driveMotor.stopMotor();
+        m_turningMotor.stopMotor();
     }
 
     public void stop() {
