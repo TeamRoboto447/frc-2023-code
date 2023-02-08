@@ -8,6 +8,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ArmSubsystem;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -42,12 +44,14 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
  */
 public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final ArmSubsystem m_robotArm = new ArmSubsystem();
   private final PowerDistribution PDP = new PowerDistribution(0, ModuleType.kCTRE);
 
   private final DigitalInput autonomousSelector1 = new DigitalInput(0);
 
   Joystick m_driverController = new Joystick(OIConstants.kDriverControllerPort);
   JoystickControl m_joystickControl = new JoystickControl(m_driverController, 0.1, 0.25, 10, 0.333);
+  XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
 
   public RobotContainer() {
     // Configure the trigger bindings
@@ -55,7 +59,6 @@ public class RobotContainer {
 
     m_robotDrive.setDefaultCommand(
         new RunCommand(() -> {
-
 
           if (m_driverController.getRawButton(5)) {
             m_robotDrive.drive(
@@ -87,8 +90,29 @@ public class RobotContainer {
 
         }, m_robotDrive));
 
+    m_robotArm.setDefaultCommand(
+        new RunCommand(() -> {
+
+          m_robotArm.moveHorizontal(deadzone(m_operatorController.getLeftX(), 0.25));
+          m_robotArm.moveVertical(deadzone(m_operatorController.getLeftY(), 0.25));
+
+          m_robotArm.moveRotation(deadzone(m_operatorController.getRightX(), 0.25));
+
+          if(m_operatorController.getLeftBumper())
+            m_robotArm.extend();
+          else
+            m_robotArm.retract();
+
+          if(m_operatorController.getRightBumper())
+            m_robotArm.open();
+          else
+            m_robotArm.close();
+
+        }, m_robotArm));
+
     PDP.getModule();
   }
+
   private boolean enableROT() {
     return m_driverController.getRawButton(1);
   }
@@ -108,7 +132,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
 
     if (autonomousSelector1.get()) {
-      
+
       TrajectoryConfig trajectoryConfig = new TrajectoryConfig(20, 10).setKinematics(DriveConstants.kDriveKinematics);
 
       Trajectory trajectory1 = TrajectoryGenerator.generateTrajectory(
@@ -199,6 +223,13 @@ public class RobotContainer {
     }
   }
 
+  protected double deadzone(double val, double deadzone) {
+    if (Math.abs(deadzone) > Math.abs(val))
+      return 0;
+    else
+      return val;
+  }
+
   private class JoystickControl {
     private final Joystick joystick;
     private final double deadzoneXY;
@@ -237,12 +268,4 @@ public class RobotContainer {
       this.enableROT = enabled;
     }
   }
-
-  private double deadzone(double val, double deadzone) {
-    if (Math.abs(deadzone) > Math.abs(val))
-      return 0;
-    else
-      return val;
-  }
-
 }
