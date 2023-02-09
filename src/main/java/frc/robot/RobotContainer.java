@@ -96,7 +96,7 @@ public class RobotContainer {
           m_robotArm.moveHorizontal(deadzone(m_operatorController.getLeftX(), 0.25));
           m_robotArm.moveVertical(deadzone(m_operatorController.getLeftY(), 0.25));
 
-          m_robotArm.moveRotation(deadzone(m_operatorController.getRightX(), 0.25));
+          m_robotArm.rotateGrabber(deadzone(m_operatorController.getRightX(), 0.25));
 
           if(m_operatorController.getLeftBumper())
             m_robotArm.extend();
