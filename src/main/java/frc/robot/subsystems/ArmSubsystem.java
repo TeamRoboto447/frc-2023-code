@@ -18,8 +18,8 @@ public class ArmSubsystem extends SubsystemBase {
     private final DoubleSolenoid extensionRetractionSolenoid;
     private final DoubleSolenoid openCloseSolenoid;
 
-    private final double speedScaleFactor = 0.1;
-    private final double rotationalspeedScaleFactor = 0.1;
+    private final double speedScaleFactor = 0.5;
+    private final double rotationalspeedScaleFactor = 0.4;
 
     public ArmSubsystem() {
         this.verticalMotor = new CANSparkMax(ArmConstants.verticalMotor, MotorType.kBrushless);
@@ -28,6 +28,7 @@ public class ArmSubsystem extends SubsystemBase {
 
         this.extensionRetractionSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM,
                 ArmConstants.extensionSolenoid, ArmConstants.retractionSolenoid);
+
         this.openCloseSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, ArmConstants.openSolenoid,
                 ArmConstants.closeSolenoid);
     }

@@ -114,9 +114,9 @@ public class SwerveModule {
         m_turningMotor.stopMotor();
     }
 
-    public void stop() {
-        m_driveMotor.stopMotor();
-        m_turningMotor.stopMotor();
-    }
+   // public void stop() {
+     //   m_driveMotor.stopMotor();
+       // m_turningMotor.stopMotor();
+   // }
 
 }

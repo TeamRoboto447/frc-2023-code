@@ -71,10 +71,10 @@ public final class Constants {
     public static final int horizontalMotor = 52;
     public static final int rotationalMotor = 53;
 
-    public static final int extensionSolenoid = 0;
+    public static final int extensionSolenoid = 2;
     public static final int retractionSolenoid = 1;
-    public static final int openSolenoid = 2;
-    public static final int closeSolenoid = 3; 
+    public static final int openSolenoid = 0;
+    public static final int closeSolenoid = 3;
   }
 
   public static final class OIConstants {
