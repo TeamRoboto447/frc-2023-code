@@ -258,7 +258,7 @@ public class RobotContainer {
     }
 
     public double getROT() {
-      return this.enableROT ? (deadzone(this.joystick.getZ(), this.deadzoneROT) * this.multiplierROT) : 0;
+      return this.enableROT ? -(deadzone(this.joystick.getZ(), this.deadzoneROT) * this.multiplierROT) : 0;
     }
 
     public void setEnableXYControl(boolean enabled) {
