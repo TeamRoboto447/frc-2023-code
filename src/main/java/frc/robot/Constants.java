@@ -75,6 +75,9 @@ public final class Constants {
     public static final int retractionSolenoid = 1;
     public static final int openSolenoid = 0;
     public static final int closeSolenoid = 3;
+
+    public static final double kPArmPositionController = 0.1;
+    public static final double rotationsToFullMovement = 100;
   }
 
   public static final class OIConstants {

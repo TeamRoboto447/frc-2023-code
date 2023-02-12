@@ -7,13 +7,9 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 
 public class SwerveModule {
@@ -23,15 +19,6 @@ public class SwerveModule {
     private final WPI_CANCoder m_turningEncoder;
 
     private final PIDController m_drivePIDController = new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
-
-    // private final ProfiledPIDController m_turningPIDController =
-    // new ProfiledPIDController(
-    // ModuleConstants.kPModuleTurningController,
-    // 0,
-    // 0,
-    // new TrapezoidProfile.Constraints(
-    // ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
-    // ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
 
     private final PIDController m_turningPIDController = new PIDController(ModuleConstants.kPModuleTurningController, 0,
             0);

@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkMax;
 import frc.robot.Constants.ArmConstants;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -21,6 +22,9 @@ public class ArmSubsystem extends SubsystemBase {
     private final double speedScaleFactor = 0.5;
     private final double rotationalspeedScaleFactor = 0.4;
 
+    private double currentTarget = 0;
+    private final PIDController m_armVerticalPositionController = new PIDController(ArmConstants.kPArmPositionController, 0, 0);
+
     public ArmSubsystem() {
         this.verticalMotor = new CANSparkMax(ArmConstants.verticalMotor, MotorType.kBrushless);
         this.horizontalMotor = new CANSparkMax(ArmConstants.horizontalMotor, MotorType.kBrushless);
@@ -34,7 +38,11 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public void moveVertical(double speed) {
-        this.verticalMotor.set(speed * this.speedScaleFactor);
+        currentTarget += speed;
+        double targetSpeed = m_armVerticalPositionController.calculate(this.verticalMotor.getEncoder().getPosition(), currentTarget);
+        this.verticalMotor.set(targetSpeed);
+
+        // this.verticalMotor.set(speed * this.speedScaleFactor);
     }
 
     public void moveHorizontal(double speed) {
