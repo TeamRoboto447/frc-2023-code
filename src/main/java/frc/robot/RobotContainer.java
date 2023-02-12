@@ -136,18 +136,20 @@ public class RobotContainer {
 
       TrajectoryConfig trajectoryConfig = new TrajectoryConfig(20, 10).setKinematics(DriveConstants.kDriveKinematics);
 
+      // Trajectory1 instructs the first movement step where to go, this one moves -4 units side to side
       Trajectory trajectory1 = TrajectoryGenerator.generateTrajectory(
-          new Pose2d(0, 0, new Rotation2d(0)),
+          new Pose2d(0, 0, new Rotation2d(0)), // starting rotation of trajectory 1 is specified here
           List.of(
-              new Translation2d(-2, 0.1)),
-          new Pose2d(-4, 0, Rotation2d.fromDegrees(0)),
+              new Translation2d(-2, 01)),
+          new Pose2d(-4, 0, Rotation2d.fromDegrees(0)), // end rotation of trajectory 1 is specified here
           trajectoryConfig);
 
+    // Trajectory2 instructs the second movement step where to go, this one moves -10 units forward and back
       Trajectory trajectory2 = TrajectoryGenerator.generateTrajectory(
-          new Pose2d(-4, 0, new Rotation2d(0)),
+          new Pose2d(-4, 0, new Rotation2d(0)), // start rotation of trajectory 2 is specified here
           List.of(
               new Translation2d(-4.1, -5)),
-          new Pose2d(-4, -10, Rotation2d.fromDegrees(0)),
+          new Pose2d(-4, -10, Rotation2d.fromDegrees(0)), // end rotation of trajectory 2 is specified here
           trajectoryConfig);
 
       PIDController xController = new PIDController(0.5, 0, 0);
@@ -160,6 +162,7 @@ public class RobotContainer {
               ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
       thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
+      // Use instructions from trajectory1 to create the first movement step
       SwerveControllerCommand movementStep1 = new SwerveControllerCommand(
           trajectory1,
           m_robotDrive::getPose,
@@ -170,6 +173,8 @@ public class RobotContainer {
           m_robotDrive::setModuleStates,
           m_robotDrive);
 
+          
+      // Use instructions from trajectory2 to create the second movement step
       SwerveControllerCommand movementStep2 = new SwerveControllerCommand(
           trajectory2,
           m_robotDrive::getPose,
@@ -181,10 +186,10 @@ public class RobotContainer {
           m_robotDrive);
 
       return new SequentialCommandGroup(
-          new InstantCommand(() -> m_robotDrive.resetOdometry(trajectory1.getInitialPose())),
-          movementStep1,
-          movementStep2,
-          new InstantCommand(() -> m_robotDrive.stopModules()));
+          new InstantCommand(() -> m_robotDrive.resetOdometry(trajectory1.getInitialPose())), //reset position to match expected starting position
+          movementStep1, // do first movement
+          movementStep2, // do second movement
+          new InstantCommand(() -> m_robotDrive.stopModules())); // stop the robot
 
     } else {
 
@@ -220,6 +225,7 @@ public class RobotContainer {
       return new SequentialCommandGroup(
           new InstantCommand(() -> m_robotDrive.resetOdometry(trajectory1.getInitialPose())),
           movementStep1,
+          movementStep2,
           new InstantCommand(() -> m_robotDrive.stopModules()));
     }
   }

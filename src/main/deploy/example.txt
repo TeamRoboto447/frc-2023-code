@@ -1,3 +1,37 @@
-Files placed in this directory will be deployed to the RoboRIO into the
-'deploy' directory in the home folder. Use the 'Filesystem.getDeployDirectory' wpilib function
-to get a proper path relative to the deploy directory.
+
+start in front of Scoring postion
+
+Extend Arm out, lift grabber
+
+Open Grabber
+
+drive left x units, drive forward x units and park on charge station
+
+________________________________________________________________
+
+
+start in front of Scoring postion
+
+Extend Arm out, lift grabber
+
+Open Grabber
+
+Drive to new game peice, rotate 180 degree and bring grabber back to starting level
+
+Open grabber, compete the drive, close grabber, go in reverse to next scoring point
+
+Park on charge station
+
+_________________________________________________________________
+
+start in front of Scoring postion
+
+Extend Arm out, lift grabber
+
+Open Grabber
+
+Drive to new previous game peice  and bring grabber back to starting level, rotate 90 degree, drive left x feet
+
+Open grabber, compete the drive, close grabber, go in reverse to next scoring point
+
+Park on charge station
