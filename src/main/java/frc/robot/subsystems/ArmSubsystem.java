@@ -22,8 +22,10 @@ public class ArmSubsystem extends SubsystemBase {
     private final double speedScaleFactor = 0.5;
     private final double rotationalspeedScaleFactor = 0.4;
 
-    private double currentTarget = 0;
+    private double currentHeightTarget = 0;
+    private double currentDistTarget = 0;
     private final PIDController m_armVerticalPositionController = new PIDController(ArmConstants.kPArmPositionController, 0, 0);
+    private final PIDController m_armHorizontalPositionController = new PIDController(ArmConstants.kPArmPositionController, 0, 0);
 
     public ArmSubsystem() {
         this.verticalMotor = new CANSparkMax(ArmConstants.verticalMotor, MotorType.kBrushless);
@@ -38,15 +40,39 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public void moveVertical(double speed) {
-        currentTarget += speed;
-        double targetSpeed = m_armVerticalPositionController.calculate(this.verticalMotor.getEncoder().getPosition(), currentTarget);
+        currentHeightTarget += speed;
+        double targetSpeed = m_armVerticalPositionController.calculate(this.verticalMotor.getEncoder().getPosition(), currentHeightTarget);
         this.verticalMotor.set(targetSpeed);
+    }
 
-        // this.verticalMotor.set(speed * this.speedScaleFactor);
+    public boolean goToVertical(double target) {
+        currentHeightTarget = target;
+        double targetSpeed = m_armVerticalPositionController.calculate(this.verticalMotor.getEncoder().getPosition(), currentHeightTarget);
+        this.verticalMotor.set(targetSpeed);
+        return m_armVerticalPositionController.atSetpoint();
+    }
+
+    public void holdVertical() {
+        double targetSpeed = m_armHorizontalPositionController.calculate(this.verticalMotor.getEncoder().getPosition(), currentHeightTarget);
+        this.verticalMotor.set(targetSpeed);
+    }
+
+    public boolean goToHorizontal(double target) {
+        currentDistTarget = target;
+        double targetSpeed = m_armHorizontalPositionController.calculate(this.horizontalMotor.getEncoder().getPosition(), currentDistTarget);
+        this.horizontalMotor.set(targetSpeed);
+        return m_armHorizontalPositionController.atSetpoint();
     }
 
     public void moveHorizontal(double speed) {
-        this.horizontalMotor.set(speed * this.speedScaleFactor);
+        currentDistTarget += speed;
+        double targetSpeed = m_armHorizontalPositionController.calculate(this.horizontalMotor.getEncoder().getPosition(), currentDistTarget);
+        this.horizontalMotor.set(targetSpeed);
+    }
+
+    public void holdHorizontal() {
+        double targetSpeed = m_armVerticalPositionController.calculate(this.horizontalMotor.getEncoder().getPosition(), currentDistTarget);
+        this.horizontalMotor.set(targetSpeed);
     }
 
     public void rotateGrabber(double speed) {

@@ -4,10 +4,13 @@
 
 package frc.robot;
 
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.FollowTrajectory;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.utils.GetAutonomousScript;
 import frc.robot.subsystems.ArmSubsystem;
 
 import java.util.List;
@@ -18,7 +21,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.AutoConstants.trajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -133,59 +136,12 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
 
     if (autonomousSelector1.get()) {
-
-      TrajectoryConfig trajectoryConfig = new TrajectoryConfig(20, 10).setKinematics(DriveConstants.kDriveKinematics);
-
-      // Trajectory1 instructs the first movement step where to go, this one moves -4 units side to side
-      Trajectory trajectory1 = TrajectoryGenerator.generateTrajectory(
-          new Pose2d(0, 0, new Rotation2d(0)), // starting rotation of trajectory 1 is specified here
-          List.of(
-              new Translation2d(-2, 01)),
-          new Pose2d(-4, 0, Rotation2d.fromDegrees(0)), // end rotation of trajectory 1 is specified here
-          trajectoryConfig);
-
-    // Trajectory2 instructs the second movement step where to go, this one moves -10 units forward and back
-      Trajectory trajectory2 = TrajectoryGenerator.generateTrajectory(
-          new Pose2d(-4, 0, new Rotation2d(0)), // start rotation of trajectory 2 is specified here
-          List.of(
-              new Translation2d(-4.1, -5)),
-          new Pose2d(-4, -10, Rotation2d.fromDegrees(0)), // end rotation of trajectory 2 is specified here
-          trajectoryConfig);
-
-      PIDController xController = new PIDController(0.5, 0, 0);
-      PIDController yController = new PIDController(0.5, 0, 0);
-      ProfiledPIDController thetaController = new ProfiledPIDController(
-          0.75,
-          0,
-          0,
-          new TrapezoidProfile.Constraints(ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
-              ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
-      thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-      // Use instructions from trajectory1 to create the first movement step
-      SwerveControllerCommand movementStep1 = new SwerveControllerCommand(
-          trajectory1,
-          m_robotDrive::getPose,
-          DriveConstants.kDriveKinematics,
-          xController,
-          yController,
-          thetaController,
-          m_robotDrive::setModuleStates,
-          m_robotDrive);
-
-          
-      // Use instructions from trajectory2 to create the second movement step
-      SwerveControllerCommand movementStep2 = new SwerveControllerCommand(
-          trajectory2,
-          m_robotDrive::getPose,
-          DriveConstants.kDriveKinematics,
-          xController,
-          yController,
-          thetaController,
-          m_robotDrive::setModuleStates,
-          m_robotDrive);
-
-      return new SequentialCommandGroup(
+      Trajectory trajectory1 = GetAutonomousScript.getTrajectory(GetAutonomousScript.Script.DEMO_SCRIPT_1, 1); // Get first movement trajectory based on what script and what step
+      FollowTrajectory movementStep1 = new FollowTrajectory(m_robotDrive, trajectory1, false); // Use first movement trajectory to make a path following command
+      Trajectory trajectory2 = GetAutonomousScript.getTrajectory(GetAutonomousScript.Script.DEMO_SCRIPT_1, 2); // Get second movement trajectory based on what script and what step
+      FollowTrajectory movementStep2 = new FollowTrajectory(m_robotDrive, trajectory2, true); // Use second movement trajectory to make a path following command
+      
+      return new SequentialCommandGroup( // Return a sequential command group (Does the listed commands in order)
           new InstantCommand(() -> m_robotDrive.resetOdometry(trajectory1.getInitialPose())), //reset position to match expected starting position
           movementStep1, // do first movement
           movementStep2, // do second movement
@@ -193,40 +149,13 @@ public class RobotContainer {
 
     } else {
 
-      TrajectoryConfig trajectoryConfig = new TrajectoryConfig(20, 10).setKinematics(DriveConstants.kDriveKinematics);
-
-      Trajectory trajectory1 = TrajectoryGenerator.generateTrajectory(
-          new Pose2d(0, 0, new Rotation2d(0)),
-          List.of(
-              new Translation2d(-2, 0.1)),
-          new Pose2d(-4, 0, Rotation2d.fromDegrees(0)),
-          trajectoryConfig);
-
-      PIDController xController = new PIDController(0.5, 0, 0);
-      PIDController yController = new PIDController(0.5, 0, 0);
-      ProfiledPIDController thetaController = new ProfiledPIDController(
-          0.75,
-          0,
-          0,
-          new TrapezoidProfile.Constraints(ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
-              ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
-      thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-      SwerveControllerCommand movementStep1 = new SwerveControllerCommand(
-          trajectory1,
-          m_robotDrive::getPose,
-          DriveConstants.kDriveKinematics,
-          xController,
-          yController,
-          thetaController,
-          m_robotDrive::setModuleStates,
-          m_robotDrive);
-
-      return new SequentialCommandGroup(
-          new InstantCommand(() -> m_robotDrive.resetOdometry(trajectory1.getInitialPose())),
-          movementStep1,
-          movementStep2,
-          new InstantCommand(() -> m_robotDrive.stopModules()));
+      Trajectory trajectory1 = GetAutonomousScript.getTrajectory(GetAutonomousScript.Script.DEMO_SCRIPT_2, 1); // Get movement trajectory based on what script and what step
+      SwerveControllerCommand movementStep1 = new FollowTrajectory(m_robotDrive, trajectory1, true); // Use movement trajectory to make a path following command
+      
+      return new SequentialCommandGroup( // Return a sequential command group (Does the listed commands in order)
+          new InstantCommand(() -> m_robotDrive.resetOdometry(trajectory1.getInitialPose())), //reset position to match expected starting position
+          movementStep1, // do movement
+          new InstantCommand(() -> m_robotDrive.stopModules())); // stop the robot
     }
   }
 

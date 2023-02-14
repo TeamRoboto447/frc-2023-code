@@ -4,8 +4,13 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -83,5 +88,22 @@ public final class Constants {
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;
+  }
+
+  public static class FieldConstants {
+    static final double length = Units.feetToMeters(54);
+    static final double width = Units.feetToMeters(27);
+}
+
+  public static final class AutoConstants {
+    public static final TrajectoryConfig trajectoryConfig = new TrajectoryConfig(20, 10).setKinematics(DriveConstants.kDriveKinematics);
+    public static PIDController xController = new PIDController(0.5, 0, 0);
+    public static PIDController yController = new PIDController(0.5, 0, 0);
+    public static ProfiledPIDController thetaController = new ProfiledPIDController(
+          0.75,
+          0,
+          0,
+          new TrapezoidProfile.Constraints(ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
+              ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
   }
 }
