@@ -56,6 +56,8 @@ public final class Constants {
     public static final boolean kGyroReversed = false;
 
     public static final double kMaxSpeedMetersPerSecond = 30;
+
+    public static final double angleOffset = -90;
   }
 
   public static class ModuleConstants {
@@ -81,8 +83,19 @@ public final class Constants {
     public static final int openSolenoid = 0;
     public static final int closeSolenoid = 3;
 
-    public static final double kPArmPositionController = 0.1;
-    public static final double rotationsToFullMovement = 100;
+    public static final double kPArmVerticalController = 0.1;
+    public static final double kIArmVerticalController = 0.1;
+    public static final double kPArmHorizontalController = 0.1;
+    public static final double kIArmHorizontalController = 0.05;
+    public static final double kPArmRotationalController = 0.1;
+
+    public static final double verticalRange = 46.25;
+    public static final double horizontalRange = 63.86;
+    public static final double rotationalRange = 3.1; // per direction
+
+    public static final double horizontalPIDTolerance = 0.1;
+    public static final double verticalPIDTolerance = 0.2;
+    public static final double rotationalPIDTolerance = 0.1;
   }
 
   public static final class OIConstants {

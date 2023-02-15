@@ -4,26 +4,17 @@
 
 package frc.robot;
 
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.ModuleConstants;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.FollowTrajectory;
+import frc.robot.commands.HoldArmStill;
+import frc.robot.commands.MoveArmToPosition;
+import frc.robot.commands.SetGrabber;
+import frc.robot.commands.SetGrabberExtension;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.utils.GetAutonomousScript;
 import frc.robot.subsystems.ArmSubsystem;
-
-import java.util.List;
-
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.AutoConstants.trajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -127,13 +118,24 @@ public class RobotContainer {
 
   private void configureBindings() {
   }
+ 
 
+  boolean demoAuto = false;
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    if(!demoAuto) {
+      return new SequentialCommandGroup(
+        new SetGrabber(m_robotArm, false),
+        new MoveArmToPosition(m_robotArm, -ArmConstants.verticalRange, ArmConstants.horizontalRange),
+        new InstantCommand(() -> {System.out.println("Done moving");}),
+        new SetGrabberExtension(m_robotArm, true),
+        new SetGrabber(m_robotArm, true)
+      );
+    }
 
     if (autonomousSelector1.get()) {
       Trajectory trajectory1 = GetAutonomousScript.getTrajectory(GetAutonomousScript.Script.DEMO_SCRIPT_1, 1); // Get first movement trajectory based on what script and what step

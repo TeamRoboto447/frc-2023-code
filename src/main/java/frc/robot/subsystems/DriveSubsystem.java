@@ -52,6 +52,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    m_gyro.setAngleAdjustment(DriveConstants.angleOffset);
     m_odometry.update(
         m_gyro.getRotation2d(),
         new SwerveModulePosition[] {

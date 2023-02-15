@@ -23,8 +23,7 @@ public class HoldArmStill extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    this.armSubsystem.holdVertical();
-    this.armSubsystem.holdHorizontal();
+    this.armSubsystem.holdAll();
   }
 
   // Called once the command ends or is interrupted.
