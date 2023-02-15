@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkMax;
 import frc.robot.Constants.ArmConstants;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
@@ -23,6 +24,7 @@ public class ArmSubsystem extends SubsystemBase {
     private final double speedScaleFactor = 1.2;
     private final double rotationalspeedScaleFactor = 0.2;
 
+    private double maxPIDOutput = 1;
     private double currentHeightTarget = 0;
     private double currentDistTarget = 0;
     private double currentRotTarget = 0;
@@ -48,67 +50,71 @@ public class ArmSubsystem extends SubsystemBase {
 
     public void moveVertical(double speed) {
         currentHeightTarget += speed * speedScaleFactor;
-        double targetSpeed = m_armVerticalPositionController.calculate(this.verticalMotor.getEncoder().getPosition(), currentHeightTarget);
-        this.verticalMotor.set(targetSpeed);
-        SmartDashboard.putNumber("Vertical Encoder Value", this.verticalMotor.getEncoder().getPosition());
+        runVertical();
     }
 
     public boolean goToVertical(double target) {
-        currentHeightTarget = target;
-        double targetSpeed = m_armVerticalPositionController.calculate(this.verticalMotor.getEncoder().getPosition(), currentHeightTarget);
-        this.verticalMotor.set(targetSpeed);
-        SmartDashboard.putNumber("Vertical Encoder Value", this.verticalMotor.getEncoder().getPosition());
+        currentHeightTarget = Double.isNaN(target) ? currentHeightTarget : target;
+        runVertical();
         return m_armVerticalPositionController.atSetpoint();
     }
 
     public void holdVertical() {
-        double targetSpeed = m_armHorizontalPositionController.calculate(this.verticalMotor.getEncoder().getPosition(), currentHeightTarget);
-        this.verticalMotor.set(targetSpeed);
+        runVertical();
     }
 
     public boolean goToHorizontal(double target) {
-        currentDistTarget = target;
-        double targetSpeed = m_armHorizontalPositionController.calculate(this.horizontalMotor.getEncoder().getPosition(), currentDistTarget);
-        this.horizontalMotor.set(targetSpeed);
-        SmartDashboard.putNumber("Horizontal Encoder Value", this.horizontalMotor.getEncoder().getPosition());
+        currentDistTarget = Double.isNaN(target) ? currentDistTarget : target;
+        runHorizontal();
         return m_armHorizontalPositionController.atSetpoint();
     }
 
     public void moveHorizontal(double speed) {
         currentDistTarget += speed * speedScaleFactor;;
-        double targetSpeed = m_armHorizontalPositionController.calculate(this.horizontalMotor.getEncoder().getPosition(), currentDistTarget);
-        this.horizontalMotor.set(targetSpeed);
-        SmartDashboard.putNumber("Horizontal Encoder Value", this.horizontalMotor.getEncoder().getPosition());
+        runHorizontal();
     }
 
     public void holdHorizontal() {
-        double targetSpeed = m_armVerticalPositionController.calculate(this.horizontalMotor.getEncoder().getPosition(), currentDistTarget);
-        this.horizontalMotor.set(targetSpeed);
+        runHorizontal();
     }
 
     public boolean goToRotation(double target) {
-        currentRotTarget = target;
-        double targetSpeed = m_armRotationalController.calculate(this.rotationalMotor.getEncoder().getPosition(), currentRotTarget);
-        this.rotationalMotor.set(targetSpeed);
+        currentRotTarget = Double.isNaN(target) ? currentRotTarget : target;
+        runRotation();
         return m_armRotationalController.atSetpoint();
     }
 
     public void rotateGrabber(double speed) {
         currentRotTarget += speed * this.rotationalspeedScaleFactor;
-        double targetSpeed = m_armRotationalController.calculate(this.rotationalMotor.getEncoder().getPosition(), currentRotTarget);
-        this.rotationalMotor.set(targetSpeed);
-        SmartDashboard.putNumber("Rotational Encoder Value", this.rotationalMotor.getEncoder().getPosition());
+        runRotation();
     }
 
     public void holdRotation() {
-        double targetSpeed = m_armRotationalController.calculate(this.rotationalMotor.getEncoder().getPosition(), currentRotTarget);
-        this.rotationalMotor.set(targetSpeed);
+        runRotation();
     }
 
     public void holdAll() {
         this.holdHorizontal();
         this.holdRotation();
         this.holdVertical();
+    }
+
+    private void runVertical() {
+        double targetSpeed = clampedVerticalCalculate();
+        this.verticalMotor.set(targetSpeed);
+        SmartDashboard.putNumber("Vertical Encoder Value", this.verticalMotor.getEncoder().getPosition());
+    }
+
+    private void runHorizontal() {
+        double targetSpeed = clampedHorizontalCalculate();
+        this.horizontalMotor.set(targetSpeed);
+        SmartDashboard.putNumber("Horizontal Encoder Value", this.horizontalMotor.getEncoder().getPosition());
+    }
+
+    private void runRotation() {
+        double targetSpeed = clampedRotationalCalculate();
+        this.rotationalMotor.set(targetSpeed);
+        SmartDashboard.putNumber("Rotational Encoder Value", this.rotationalMotor.getEncoder().getPosition());
     }
 
     public void extend() {
@@ -125,6 +131,22 @@ public class ArmSubsystem extends SubsystemBase {
 
     public void close() {
         this.openCloseSolenoid.set(Value.kReverse);
+    }
+
+    public void setMaxArmSpeeds(double maxSpeed) {
+        this.maxPIDOutput = maxSpeed;
+    }
+
+    private double clampedVerticalCalculate() {
+        return MathUtil.clamp(m_armVerticalPositionController.calculate(this.verticalMotor.getEncoder().getPosition(), currentHeightTarget), -this.maxPIDOutput, this.maxPIDOutput);
+    }
+
+    private double clampedHorizontalCalculate() {
+        return MathUtil.clamp(m_armVerticalPositionController.calculate(this.horizontalMotor.getEncoder().getPosition(), currentDistTarget), -this.maxPIDOutput, this.maxPIDOutput);
+    }
+
+    private double clampedRotationalCalculate() {
+        return MathUtil.clamp(this.m_armRotationalController.calculate(this.rotationalMotor.getEncoder().getPosition(), this.currentRotTarget), -this.maxPIDOutput, this.maxPIDOutput);
     }
 
 }

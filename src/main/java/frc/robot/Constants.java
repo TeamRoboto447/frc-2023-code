@@ -118,5 +118,7 @@ public final class Constants {
           0,
           new TrapezoidProfile.Constraints(ModuleConstants.kMaxModuleAngularSpeedRadiansPerSecond,
               ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
+    public static double NO_MOVEMENT = Double.NaN;
+    public static double MAX_ARM_SPEED_OUTPUT = 0.4;
   }
 }

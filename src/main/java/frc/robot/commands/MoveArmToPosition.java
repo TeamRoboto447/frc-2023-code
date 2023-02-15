@@ -11,35 +11,43 @@ public class MoveArmToPosition extends CommandBase {
   private final ArmSubsystem armSubsystem;
   private final double targetHeight;
   private final double targetDist;
+  private final double targetRot;
   private boolean verticalDone = false;
   private boolean horizontalDone = false;
+  private boolean rotationDone = false;
   /** Creates a new ExtendAndLift. */
-  public MoveArmToPosition(ArmSubsystem aSubsystem, double tHeight, double tDist) {
+  public MoveArmToPosition(ArmSubsystem aSubsystem, double tHeight, double tDist, double tRot) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.armSubsystem = aSubsystem;
     this.targetHeight = tHeight;
     this.targetDist = tDist;
+    this.targetRot = tRot;
     addRequirements(aSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    this.armSubsystem.setMaxArmSpeeds(0.25);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     this.verticalDone = this.armSubsystem.goToVertical(targetHeight);
     this.horizontalDone = this.armSubsystem.goToHorizontal(targetDist);
+    this.rotationDone = this.armSubsystem.goToRotation(targetRot);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    this.armSubsystem.setMaxArmSpeeds(1);
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return verticalDone && horizontalDone;
+    return this.verticalDone && this.horizontalDone && this.rotationDone;
   }
 }

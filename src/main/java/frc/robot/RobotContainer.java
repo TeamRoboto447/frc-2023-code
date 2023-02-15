@@ -5,6 +5,7 @@
 package frc.robot;
 
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.FollowTrajectory;
 import frc.robot.commands.HoldArmStill;
@@ -130,7 +131,8 @@ public class RobotContainer {
     if(!demoAuto) {
       return new SequentialCommandGroup(
         new SetGrabber(m_robotArm, false),
-        new MoveArmToPosition(m_robotArm, -ArmConstants.verticalRange, ArmConstants.horizontalRange),
+        new MoveArmToPosition(m_robotArm, -ArmConstants.verticalRange, AutoConstants.NO_MOVEMENT, AutoConstants.NO_MOVEMENT),
+        new MoveArmToPosition(m_robotArm, -ArmConstants.verticalRange, ArmConstants.horizontalRange, AutoConstants.NO_MOVEMENT),
         new InstantCommand(() -> {System.out.println("Done moving");}),
         new SetGrabberExtension(m_robotArm, true),
         new SetGrabber(m_robotArm, true)
