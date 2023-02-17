@@ -89,10 +89,11 @@ public class RobotContainer {
     m_robotArm.setDefaultCommand(
         new RunCommand(() -> {
 
-          m_robotArm.moveHorizontal(deadzone(m_operatorController.getLeftX(), 0.25));
-          m_robotArm.moveVertical(deadzone(m_operatorController.getLeftY(), 0.25));
+          m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getLeftX()/4, 0.25));
 
-          m_robotArm.rotateGrabber(deadzone(m_operatorController.getRightX(), 0.25));
+          m_robotArm.rawMoveVertical(deadzone(m_operatorController.getLeftY()/4, 0.25));
+
+          m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getRightX()/8, 0.25));
 
           if(m_operatorController.getLeftBumper())
             m_robotArm.extend();
@@ -131,8 +132,8 @@ public class RobotContainer {
     if(!demoAuto) {
       return new SequentialCommandGroup(
         new SetGrabber(m_robotArm, false),
-        new MoveArmToPosition(m_robotArm, -ArmConstants.verticalRange, AutoConstants.NO_MOVEMENT, AutoConstants.NO_MOVEMENT),
-        new MoveArmToPosition(m_robotArm, -ArmConstants.verticalRange, ArmConstants.horizontalRange, AutoConstants.NO_MOVEMENT),
+        new MoveArmToPosition(m_robotArm, ArmConstants.verticalRange, AutoConstants.NO_MOVEMENT, AutoConstants.NO_MOVEMENT),
+        new MoveArmToPosition(m_robotArm, ArmConstants.verticalRange, ArmConstants.horizontalRange, AutoConstants.NO_MOVEMENT),
         new InstantCommand(() -> {System.out.println("Done moving");}),
         new SetGrabberExtension(m_robotArm, true),
         new SetGrabber(m_robotArm, true)

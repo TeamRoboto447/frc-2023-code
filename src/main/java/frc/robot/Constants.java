@@ -83,6 +83,8 @@ public final class Constants {
     public static final int openSolenoid = 0;
     public static final int closeSolenoid = 3;
 
+    public static final int upperArmLimit = 0;
+
     public static final double kPArmVerticalController = 0.1;
     public static final double kIArmVerticalController = 0.1;
     public static final double kPArmHorizontalController = 0.1;

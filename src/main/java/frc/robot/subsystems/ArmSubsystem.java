@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -21,6 +22,8 @@ public class ArmSubsystem extends SubsystemBase {
     private final DoubleSolenoid extensionRetractionSolenoid;
     private final DoubleSolenoid openCloseSolenoid;
 
+    private final DigitalInput armAtVericalLimit;
+
     private final double speedScaleFactor = 1.2;
     private final double rotationalspeedScaleFactor = 0.2;
 
@@ -34,8 +37,11 @@ public class ArmSubsystem extends SubsystemBase {
 
     public ArmSubsystem() {
         this.verticalMotor = new CANSparkMax(ArmConstants.verticalMotor, MotorType.kBrushless);
+        this.verticalMotor.setInverted(true);
         this.horizontalMotor = new CANSparkMax(ArmConstants.horizontalMotor, MotorType.kBrushless);
         this.rotationalMotor = new CANSparkMax(ArmConstants.rotationalMotor, MotorType.kBrushless);
+
+        this.armAtVericalLimit = new DigitalInput(ArmConstants.upperArmLimit);
 
         this.extensionRetractionSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM,
                 ArmConstants.extensionSolenoid, ArmConstants.retractionSolenoid);
@@ -101,20 +107,32 @@ public class ArmSubsystem extends SubsystemBase {
 
     private void runVertical() {
         double targetSpeed = clampedVerticalCalculate();
-        this.verticalMotor.set(targetSpeed);
+        this.rawMoveVertical(targetSpeed);
         SmartDashboard.putNumber("Vertical Encoder Value", this.verticalMotor.getEncoder().getPosition());
     }
 
     private void runHorizontal() {
         double targetSpeed = clampedHorizontalCalculate();
-        this.horizontalMotor.set(targetSpeed);
+        this.rawMoveHorizontal(targetSpeed);
         SmartDashboard.putNumber("Horizontal Encoder Value", this.horizontalMotor.getEncoder().getPosition());
     }
 
     private void runRotation() {
         double targetSpeed = clampedRotationalCalculate();
-        this.rotationalMotor.set(targetSpeed);
+        this.rawRotateGrabber(targetSpeed);
         SmartDashboard.putNumber("Rotational Encoder Value", this.rotationalMotor.getEncoder().getPosition());
+    }
+
+    public void rawMoveVertical(double speed) {
+        this.verticalMotor.set(speed);
+    }
+    
+    public void rawMoveHorizontal(double speed) {
+        this.horizontalMotor.set(speed);
+    }
+    
+    public void rawRotateGrabber(double speed) {
+        this.rotationalMotor.set(speed);
     }
 
     public void extend() {
