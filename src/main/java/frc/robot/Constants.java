@@ -65,12 +65,13 @@ public final class Constants {
     public static final double kPModuleTurningController = 0.01;
     public static final double kMaxModuleAngularSpeedRadiansPerSecond = 2 * Math.PI;
     public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 2 * Math.PI;
-    public static final int driveEncoderTicksPerRotation = 13848;
-    public static final double wheelDiameterMeters = 0.1016;
+    public static final int driveEncoderTicksPerRotation = 2048; //13824;
+    public static final double gearRatio = 6.75;
+    public static final double wheelDiameterMeters = Units.inchesToMeters(4);//0.1016;
+    public static final double metersPerRotation =  (wheelDiameterMeters * Math.PI);
     public static final double  metersPerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts, will fix this later
-        (wheelDiameterMeters * Math.PI) / (double) driveEncoderTicksPerRotation;
-    public static final double metersPerRotation = metersPerPulse * driveEncoderTicksPerRotation;
+        metersPerRotation / ((double) driveEncoderTicksPerRotation * gearRatio);
   }
 
   public static class ArmConstants {
@@ -82,21 +83,23 @@ public final class Constants {
     public static final int retractionSolenoid = 1;
     public static final int openSolenoid = 0;
     public static final int closeSolenoid = 3;
+    public static final int brakeSolenoid = 4;
 
     public static final int upperArmLimit = 0;
-
-    public static final double kPArmVerticalController = 0.1;
-    public static final double kIArmVerticalController = 0.1;
+    
+    public static final double kPArmVerticalController = 0.2;
+    public static final double kIArmVerticalController = 0;
     public static final double kPArmHorizontalController = 0.1;
-    public static final double kIArmHorizontalController = 0.05;
+    public static final double kIArmHorizontalController = 0;
     public static final double kPArmRotationalController = 0.1;
 
-    public static final double verticalRange = 46.25;
+    public static final double verticalRange = 43.7;
     public static final double horizontalRange = 63.86;
+    public static final double horizontalStart = -9.6;
     public static final double rotationalRange = 3.1; // per direction
 
     public static final double horizontalPIDTolerance = 0.1;
-    public static final double verticalPIDTolerance = 0.2;
+    public static final double verticalPIDTolerance = 0.1;
     public static final double rotationalPIDTolerance = 0.1;
   }
 
