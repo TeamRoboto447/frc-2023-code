@@ -47,7 +47,7 @@ public class SwerveModule {
     }
 
     private double getRotationsPerSecond() {
-        return (m_driveMotor.getSelectedSensorVelocity() * 10) / ModuleConstants.driveEncoderTicksPerRotation; // Data
+        return (m_driveMotor.getSelectedSensorVelocity() * 10) / (ModuleConstants.driveEncoderTicksPerRotation * ModuleConstants.gearRatio); // Data
                                                                                                                // is
                                                                                                                // returned
                                                                                                                // in
@@ -69,7 +69,7 @@ public class SwerveModule {
     }
 
     private double getRotationsFromTicks(double ticks) {
-        return ticks / ModuleConstants.driveEncoderTicksPerRotation;
+        return ticks / (ModuleConstants.driveEncoderTicksPerRotation * ModuleConstants.gearRatio);
     }
 
     private double getDriveVelocity() {

@@ -8,7 +8,6 @@ import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.FollowTrajectory;
-import frc.robot.commands.HoldArmStill;
 import frc.robot.commands.MoveArmToPosition;
 import frc.robot.commands.SetGrabber;
 import frc.robot.commands.SetGrabberExtension;
@@ -16,7 +15,6 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.utils.GetAutonomousScript;
 import frc.robot.subsystems.ArmSubsystem;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController;
@@ -26,7 +24,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -41,8 +38,6 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ArmSubsystem m_robotArm = new ArmSubsystem();
   private final PowerDistribution PDP = new PowerDistribution(0, ModuleType.kCTRE);
-
-  private final DigitalInput autonomousSelector1 = new DigitalInput(0);
 
   Joystick m_driverController = new Joystick(OIConstants.kDriverControllerPort);
   JoystickControl m_joystickControl = new JoystickControl(m_driverController, 0.1, 0.25, 10, 0.333);
@@ -144,7 +139,7 @@ public class RobotContainer {
   }
  
 
-  boolean demoAuto = false;
+  boolean demoAuto = true;
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -160,9 +155,7 @@ public class RobotContainer {
         new SetGrabberExtension(m_robotArm, true),
         new SetGrabber(m_robotArm, true)
       );
-    }
-
-    if (autonomousSelector1.get()) {
+    } else {
       Trajectory trajectory1 = GetAutonomousScript.getTrajectory(GetAutonomousScript.Script.DEMO_SCRIPT_1, 1); // Get first movement trajectory based on what script and what step
       FollowTrajectory movementStep1 = new FollowTrajectory(m_robotDrive, trajectory1, false); // Use first movement trajectory to make a path following command
       Trajectory trajectory2 = GetAutonomousScript.getTrajectory(GetAutonomousScript.Script.DEMO_SCRIPT_1, 2); // Get second movement trajectory based on what script and what step
@@ -172,16 +165,6 @@ public class RobotContainer {
           new InstantCommand(() -> m_robotDrive.resetOdometry(trajectory1.getInitialPose())), //reset position to match expected starting position
           movementStep1, // do first movement
           movementStep2, // do second movement
-          new InstantCommand(() -> m_robotDrive.stopModules())); // stop the robot
-
-    } else {
-
-      Trajectory trajectory1 = GetAutonomousScript.getTrajectory(GetAutonomousScript.Script.DEMO_SCRIPT_2, 1); // Get movement trajectory based on what script and what step
-      SwerveControllerCommand movementStep1 = new FollowTrajectory(m_robotDrive, trajectory1, true); // Use movement trajectory to make a path following command
-      
-      return new SequentialCommandGroup( // Return a sequential command group (Does the listed commands in order)
-          new InstantCommand(() -> m_robotDrive.resetOdometry(trajectory1.getInitialPose())), //reset position to match expected starting position
-          movementStep1, // do movement
           new InstantCommand(() -> m_robotDrive.stopModules())); // stop the robot
     }
   }

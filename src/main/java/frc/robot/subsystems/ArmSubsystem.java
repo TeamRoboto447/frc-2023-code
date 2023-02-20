@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -22,6 +23,8 @@ public class ArmSubsystem extends SubsystemBase {
     private final DoubleSolenoid extensionRetractionSolenoid;
     private final DoubleSolenoid openCloseSolenoid;
 
+    private final Solenoid armBrake;
+
     private final DigitalInput armAtVericalLimit;
 
     private final double speedScaleFactor = 1.2;
@@ -29,8 +32,11 @@ public class ArmSubsystem extends SubsystemBase {
 
     private double maxPIDOutput = 1;
     private double currentHeightTarget = 0;
+    private double vMargin = 0.4;
     private double currentDistTarget = 0;
+    private double hMargin = 0.4;
     private double currentRotTarget = 0;
+    private double rMargin = 0.4;
     private final PIDController m_armVerticalPositionController = new PIDController(ArmConstants.kPArmVerticalController, ArmConstants.kIArmVerticalController, 0);
     private final PIDController m_armHorizontalPositionController = new PIDController(ArmConstants.kPArmHorizontalController, ArmConstants.kIArmHorizontalController, 0);
     private final PIDController m_armRotationalController = new PIDController(ArmConstants.kPArmRotationalController, 0, 0);
@@ -48,6 +54,8 @@ public class ArmSubsystem extends SubsystemBase {
 
         this.openCloseSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, ArmConstants.openSolenoid,
                 ArmConstants.closeSolenoid);
+
+        this.armBrake = new Solenoid(PneumaticsModuleType.CTREPCM, ArmConstants.brakeSolenoid);
 
         this.m_armHorizontalPositionController.setTolerance(ArmConstants.horizontalPIDTolerance);
         this.m_armVerticalPositionController.setTolerance(ArmConstants.verticalPIDTolerance);
@@ -109,6 +117,7 @@ public class ArmSubsystem extends SubsystemBase {
         double targetSpeed = clampedVerticalCalculate();
         this.rawMoveVertical(targetSpeed);
         SmartDashboard.putNumber("Vertical Encoder Value", this.verticalMotor.getEncoder().getPosition());
+
     }
 
     private void runHorizontal() {
@@ -125,6 +134,10 @@ public class ArmSubsystem extends SubsystemBase {
 
     public void rawMoveVertical(double speed) {
         this.verticalMotor.set(speed);
+       if(Math.abs(speed)>0)
+        this.armBrake.set(true);
+       else
+        this.armBrake.set(false);
     }
     
     public void rawMoveHorizontal(double speed) {
@@ -133,6 +146,24 @@ public class ArmSubsystem extends SubsystemBase {
     
     public void rawRotateGrabber(double speed) {
         this.rotationalMotor.set(speed);
+    }
+
+    public boolean withinMarginV() {
+        double set = this.m_armVerticalPositionController.getSetpoint();
+        double at = this.verticalMotor.getEncoder().getPosition();
+        return Math.abs(set - at) <= this.vMargin;
+    }
+
+    public boolean withinMarginH() {
+        double set = this.m_armHorizontalPositionController.getSetpoint();
+        double at = this.horizontalMotor.getEncoder().getPosition();
+        return Math.abs(set - at) <= this.hMargin;
+    }
+
+    public boolean withinMarginR() {
+        double set = this.m_armRotationalController.getSetpoint();
+        double at = this.rotationalMotor.getEncoder().getPosition();
+        return Math.abs(set - at) <= this.rMargin;
     }
 
     public void extend() {
@@ -153,6 +184,13 @@ public class ArmSubsystem extends SubsystemBase {
 
     public void setMaxArmSpeeds(double maxSpeed) {
         this.maxPIDOutput = maxSpeed;
+    }
+
+    public void stop() {
+        this.verticalMotor.stopMotor();
+        this.horizontalMotor.stopMotor();
+        this.rotationalMotor.stopMotor();
+        this.armBrake.set(false);
     }
 
     private double clampedVerticalCalculate() {
