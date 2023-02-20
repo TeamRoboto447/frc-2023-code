@@ -89,20 +89,42 @@ public class RobotContainer {
     m_robotArm.setDefaultCommand(
         new RunCommand(() -> {
 
-          m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getLeftX()/4, 0.25));
 
-          m_robotArm.rawMoveVertical(deadzone(m_operatorController.getLeftY()/4, 0.25));
-
-          m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getRightX()/8, 0.25));
+          if(m_operatorController.getXButton()) {
+            m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY()/4, 0.25));
+            m_robotArm.goToVertical(ArmConstants.verticalRange);
+            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getLeftY()/8, 0.25));
+          }
+          else if(m_operatorController.getYButton()) {
+            m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY()/4, 0.25));
+            m_robotArm.goToVertical(0);
+            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getLeftY()/8, 0.25));
+            m_robotArm.open();
+          }
+          else if(m_operatorController.getBButton()) {
+            m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY()/4, 0.25));
+            m_robotArm.goToVertical(ArmConstants.verticalRange/4);
+            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getLeftY()/8, 0.25));
+          }
+          else if(m_operatorController.getAButton()) {
+            m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY()/4, 0.25));
+            m_robotArm.goToVertical(ArmConstants.verticalRange/2);
+            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getLeftY()/8, 0.25));
+          }
+          else {
+            m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY()/4, 0.25));
+            m_robotArm.rawMoveVertical(deadzone(m_operatorController.getRightX()/4, 0.25));
+            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getLeftY()/8, 0.25));
+          }
 
           if(m_operatorController.getLeftBumper())
             m_robotArm.extend();
-          else
+          else if (m_operatorController.getRightBumper())
             m_robotArm.retract();
 
-          if(m_operatorController.getRightBumper())
+          if(m_operatorController.getBackButton())
             m_robotArm.open();
-          else
+          else if(m_operatorController.getStartButton())
             m_robotArm.close();
 
         }, m_robotArm));
