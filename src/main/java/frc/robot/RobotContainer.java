@@ -8,9 +8,6 @@ import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.FollowTrajectory;
-import frc.robot.commands.MoveArmToPosition;
-import frc.robot.commands.SetGrabber;
-import frc.robot.commands.SetGrabberExtension;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.utils.AutonUtils;
 import frc.robot.subsystems.ArmSubsystem;
@@ -19,9 +16,9 @@ import java.util.List;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController;
@@ -158,14 +155,22 @@ public class RobotContainer {
     Trajectory traj1 = TrajectoryGenerator.generateTrajectory(
       new Pose2d(0, 0, Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(0))),
       List.of(), 
-      new Pose2d(0, AutoConstants.unitsPerMeter/2, Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(90))), // Field orientation, drove left
+      new Pose2d(0, AutoConstants.unitsPerMeter, Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(90))), // Field orientation, drove left
       AutoConstants.trajectoryConfig);
-
     FollowTrajectory movement1 = new FollowTrajectory(m_robotDrive, traj1, false);
+
+    // Trajectory traj2 = TrajectoryGenerator.generateTrajectory(
+    //   new Pose2d(0, AutoConstants.unitsPerMeter, Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(90))),
+    //   List.of(), 
+    //   new Pose2d(0, 0, Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(0))), // Field orientation, drove left
+    //   AutoConstants.trajectoryConfig);
+    // FollowTrajectory movement2 = new FollowTrajectory(m_robotDrive, traj2, true);
+
 
     return new SequentialCommandGroup(
       new InstantCommand(() -> m_robotDrive.resetOdometry(AutonUtils.getStartingPose(traj1, m_robotDrive))),
       movement1,
+      // movement2,
       new InstantCommand(() -> m_robotDrive.stopModules())
     );
   }
