@@ -12,9 +12,16 @@ import frc.robot.commands.MoveArmToPosition;
 import frc.robot.commands.SetGrabber;
 import frc.robot.commands.SetGrabberExtension;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.utils.GetAutonomousScript;
+import frc.robot.utils.AutonUtils;
 import frc.robot.subsystems.ArmSubsystem;
+
+import java.util.List;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController;
@@ -40,7 +47,7 @@ public class RobotContainer {
   private final PowerDistribution PDP = new PowerDistribution(0, ModuleType.kCTRE);
 
   Joystick m_driverController = new Joystick(OIConstants.kDriverControllerPort);
-  JoystickControl m_joystickControl = new JoystickControl(m_driverController, 0.1, 0.25, 10, 0.333);
+  JoystickControl m_joystickControl = new JoystickControl(m_driverController, 0.25, 0.25, -10, -0.333);
   XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
 
   public RobotContainer() {
@@ -88,28 +95,28 @@ public class RobotContainer {
           if(m_operatorController.getXButton()) {
             m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY()/4, 0.25));
             m_robotArm.goToVertical(ArmConstants.verticalRange);
-            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getLeftY()/8, 0.25));
+            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getRightX()/4, 0.25));
           }
           else if(m_operatorController.getYButton()) {
             m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY()/4, 0.25));
             m_robotArm.goToVertical(0);
-            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getLeftY()/8, 0.25));
+            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getRightX()/4, 0.25));
             m_robotArm.open();
           }
           else if(m_operatorController.getBButton()) {
             m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY()/4, 0.25));
             m_robotArm.goToVertical(ArmConstants.verticalRange/4);
-            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getLeftY()/8, 0.25));
+            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getRightX()/4, 0.25));
           }
           else if(m_operatorController.getAButton()) {
             m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY()/4, 0.25));
             m_robotArm.goToVertical(ArmConstants.verticalRange/2);
-            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getLeftY()/8, 0.25));
+            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getRightX()/4, 0.25));
           }
           else {
-            m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY()/4, 0.25));
-            m_robotArm.rawMoveVertical(deadzone(m_operatorController.getRightX()/4, 0.25));
-            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getLeftY()/8, 0.25));
+            m_robotArm.rawMoveHorizontal(deadzone(-m_operatorController.getRightY()/4, 0.25));
+            m_robotArm.rawMoveVertical(deadzone(-m_operatorController.getLeftY()/4, 0.25));
+            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getRightX()/4, 0.25));
           }
 
           if(m_operatorController.getLeftBumper())
@@ -139,34 +146,28 @@ public class RobotContainer {
   }
  
 
-  boolean demoAuto = true;
+  // boolean demoAuto = true;
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    if(!demoAuto) {
-      return new SequentialCommandGroup(
-        new SetGrabber(m_robotArm, false),
-        new MoveArmToPosition(m_robotArm, ArmConstants.verticalRange, AutoConstants.NO_MOVEMENT, AutoConstants.NO_MOVEMENT),
-        new MoveArmToPosition(m_robotArm, ArmConstants.verticalRange, ArmConstants.horizontalRange, AutoConstants.NO_MOVEMENT),
-        new InstantCommand(() -> {System.out.println("Done moving");}),
-        new SetGrabberExtension(m_robotArm, true),
-        new SetGrabber(m_robotArm, true)
-      );
-    } else {
-      Trajectory trajectory1 = GetAutonomousScript.getTrajectory(GetAutonomousScript.Script.DEMO_SCRIPT_1, 1); // Get first movement trajectory based on what script and what step
-      FollowTrajectory movementStep1 = new FollowTrajectory(m_robotDrive, trajectory1, false); // Use first movement trajectory to make a path following command
-      Trajectory trajectory2 = GetAutonomousScript.getTrajectory(GetAutonomousScript.Script.DEMO_SCRIPT_1, 2); // Get second movement trajectory based on what script and what step
-      FollowTrajectory movementStep2 = new FollowTrajectory(m_robotDrive, trajectory2, true); // Use second movement trajectory to make a path following command
-      
-      return new SequentialCommandGroup( // Return a sequential command group (Does the listed commands in order)
-          new InstantCommand(() -> m_robotDrive.resetOdometry(trajectory1.getInitialPose())), //reset position to match expected starting position
-          movementStep1, // do first movement
-          movementStep2, // do second movement
-          new InstantCommand(() -> m_robotDrive.stopModules())); // stop the robot
-    }
+
+    Trajectory traj1 = TrajectoryGenerator.generateTrajectory(
+      new Pose2d(0, 0, Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(0))),
+      List.of(), 
+      new Pose2d(0, AutoConstants.unitsPerMeter/2, Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(90))), // Field orientation, drove left
+      AutoConstants.trajectoryConfig);
+
+    FollowTrajectory movement1 = new FollowTrajectory(m_robotDrive, traj1, false);
+
+    return new SequentialCommandGroup(
+      new InstantCommand(() -> m_robotDrive.resetOdometry(AutonUtils.getStartingPose(traj1, m_robotDrive))),
+      movement1,
+      new InstantCommand(() -> m_robotDrive.stopModules())
+    );
   }
 
   protected double deadzone(double val, double deadzone) {

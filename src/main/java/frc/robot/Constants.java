@@ -65,13 +65,15 @@ public final class Constants {
     public static final double kPModuleTurningController = 0.01;
     public static final double kMaxModuleAngularSpeedRadiansPerSecond = 2 * Math.PI;
     public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 2 * Math.PI;
-    public static final int driveEncoderTicksPerRotation = 2048; //13824;
+    public static final int driveEncoderTicksPerMotorRotation = 2048; //13824;
     public static final double gearRatio = 6.75;
+    public static final double distanceScaleForOdemetry = 9.8868;
+    public static final double driveEncoderTicksPerWheelRotation = driveEncoderTicksPerMotorRotation * gearRatio;
     public static final double wheelDiameterMeters = Units.inchesToMeters(4);//0.1016;
     public static final double metersPerRotation =  (wheelDiameterMeters * Math.PI);
     public static final double  metersPerPulse =
         // Assumes the encoders are directly mounted on the wheel shafts, will fix this later
-        metersPerRotation / ((double) driveEncoderTicksPerRotation * gearRatio);
+        metersPerRotation / ((double) driveEncoderTicksPerMotorRotation * gearRatio);
   }
 
   public static class ArmConstants {
@@ -125,5 +127,7 @@ public final class Constants {
               ModuleConstants.kMaxModuleAngularAccelerationRadiansPerSecondSquared));
     public static double NO_MOVEMENT = Double.NaN;
     public static double MAX_ARM_SPEED_OUTPUT = 0.4;
+
+    public static double unitsPerMeter = 4;
   }
 }
