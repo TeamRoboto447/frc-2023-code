@@ -142,7 +142,7 @@ public final class Constants {
 
   public static class VisionConstants {
     public static final Transform3d robotToCam = new Transform3d(
-        new Translation3d(Units.inchesToMeters(3), Units.inchesToMeters(-15), Units.inchesToMeters(26)),
+        new Translation3d(Units.inchesToMeters(-4.75), Units.inchesToMeters(2.75), Units.inchesToMeters(13)),
         new Rotation3d(0, 0, 0));
         
     public static final String cameraName = "Microsoft_LifeCam_HD-3000";
