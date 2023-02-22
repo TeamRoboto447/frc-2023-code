@@ -4,15 +4,19 @@
 
 package frc.robot.subsystems;
 
+import java.util.Optional;
+
+import org.photonvision.EstimatedRobotPose;
+
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 
@@ -39,6 +43,7 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kRearRightTurnEncoderID);
 
   private final AHRS m_gyro = new AHRS();
+  private final PhotonCameraWrapper photonWrapper;
 
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
@@ -50,8 +55,19 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition()
       });
 
+  SwerveDrivePoseEstimator m_poseEstimator = new SwerveDrivePoseEstimator(
+      DriveConstants.kDriveKinematics,
+      m_gyro.getRotation2d(),
+      new SwerveModulePosition[] {
+          m_frontLeft.getPosition(),
+          m_frontRight.getPosition(),
+          m_rearLeft.getPosition(),
+          m_rearRight.getPosition()
+      }, getPose());
+
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
+    photonWrapper = new PhotonCameraWrapper();
     m_gyro.setAngleAdjustment(DriveConstants.angleOffset);
     m_odometry.update(
         m_gyro.getRotation2d(),
@@ -66,8 +82,7 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
-    m_odometry.update(
-        m_gyro.getRotation2d(),
+    update(
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -76,8 +91,27 @@ public class DriveSubsystem extends SubsystemBase {
         });
   }
 
+  private void update(SwerveModulePosition[] modulePositions) {
+    m_odometry.update(m_gyro.getRotation2d(), modulePositions);
+    m_poseEstimator.update(m_gyro.getRotation2d(), modulePositions);
+    updateEstimationFromVision();
+  }
+
   public Pose2d getPose() {
     return m_odometry.getPoseMeters();
+  }
+
+  public Pose2d getEstimatedPose() {
+    return m_poseEstimator.getEstimatedPosition();
+  }
+
+  public void updateEstimationFromVision() {
+    Optional<EstimatedRobotPose> result = photonWrapper.getEstimatedGlobalPose(m_poseEstimator.getEstimatedPosition());
+    if (result.isPresent()) {
+      EstimatedRobotPose camPose = result.get();
+      m_poseEstimator.addVisionMeasurement(
+          camPose.estimatedPose.toPose2d(), camPose.timestampSeconds);
+    }
   }
 
   public void resetOdometry(Pose2d pose) {
@@ -133,5 +167,5 @@ public class DriveSubsystem extends SubsystemBase {
     m_frontRight.stop();
     m_rearLeft.stop();
     m_rearRight.stop();
-}
+  }
 }

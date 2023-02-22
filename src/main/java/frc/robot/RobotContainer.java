@@ -13,12 +13,11 @@ import frc.robot.utils.AutonUtils;
 import frc.robot.subsystems.ArmSubsystem;
 
 import java.util.List;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController;
@@ -39,6 +38,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ArmSubsystem m_robotArm = new ArmSubsystem();
   private final PowerDistribution PDP = new PowerDistribution(0, ModuleType.kCTRE);
@@ -46,6 +46,7 @@ public class RobotContainer {
   Joystick m_driverController = new Joystick(OIConstants.kDriverControllerPort);
   JoystickControl m_joystickControl = new JoystickControl(m_driverController, 0.25, 0.25, -10, -0.333);
   XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
+
 
   public RobotContainer() {
     // Configure the trigger bindings
@@ -79,8 +80,11 @@ public class RobotContainer {
                 true);
           }
 
-          SmartDashboard.putNumber("X Coord (meters)", m_robotDrive.getPose().getX());
-          SmartDashboard.putNumber("Y Coord (meters)", m_robotDrive.getPose().getY());
+          SmartDashboard.putNumber("X Coord", Units.metersToFeet(m_robotDrive.getPose().getX()));
+          SmartDashboard.putNumber("Y Coord", Units.metersToFeet(m_robotDrive.getPose().getY()));
+
+          SmartDashboard.putNumber("Estimated X Coord", Units.metersToFeet(m_robotDrive.getEstimatedPose().getX()));
+          SmartDashboard.putNumber("Estimated Y Coord", Units.metersToFeet(m_robotDrive.getEstimatedPose().getY()));
 
         }, m_robotDrive));
 

@@ -9,7 +9,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -116,20 +115,17 @@ public class ArmSubsystem extends SubsystemBase {
     private void runVertical() {
         double targetSpeed = clampedVerticalCalculate();
         this.rawMoveVertical(targetSpeed);
-        SmartDashboard.putNumber("Vertical Encoder Value", this.verticalMotor.getEncoder().getPosition());
 
     }
 
     private void runHorizontal() {
         double targetSpeed = clampedHorizontalCalculate();
         this.rawMoveHorizontal(targetSpeed);
-        SmartDashboard.putNumber("Horizontal Encoder Value", this.horizontalMotor.getEncoder().getPosition());
     }
 
     private void runRotation() {
         double targetSpeed = clampedRotationalCalculate();
         this.rawRotateGrabber(targetSpeed);
-        SmartDashboard.putNumber("Rotational Encoder Value", this.rotationalMotor.getEncoder().getPosition());
     }
 
     public void rawMoveVertical(double speed) {
