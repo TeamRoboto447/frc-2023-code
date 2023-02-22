@@ -54,8 +54,6 @@ public class RobotContainer {
   private final ArmSubsystem m_robotArm = new ArmSubsystem();
   private final PowerDistribution PDP = new PowerDistribution(0, ModuleType.kCTRE);
 
-  private Pose2d storedPosition;
-
   Joystick m_driverController = new Joystick(OIConstants.kDriverControllerPort);
   JoystickControl m_joystickControl = new JoystickControl(m_driverController, 0.25, 0.25, -10, -0.333);
   XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
@@ -150,11 +148,11 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    Trigger storePosition = new JoystickButton(m_driverController, 10);
-    Trigger gotoStoredPotion = new JoystickButton(m_driverController, 11);
+    Trigger storePosition = new JoystickButton(m_driverController, 11);
+    Trigger gotoStoredPotion = new JoystickButton(m_driverController, 12);
 
     storePosition.onTrue(new InstantCommand(() -> {
-      this.storedPosition = m_robotDrive.getEstimatedPose();
+      m_robotDrive.setStoredPose(m_robotDrive.getEstimatedPose());
     }, m_robotDrive));
 
     gotoStoredPotion.onTrue(new CommandBase() {
@@ -172,7 +170,7 @@ public class RobotContainer {
         m_trajectory = TrajectoryGenerator.generateTrajectory(
             m_robotDrive.getEstimatedPose(),
             List.of(),
-            storedPosition,
+            m_robotDrive.getStoredPose(),
             AutoConstants.trajectoryConfig);
         m_pose = m_robotDrive::getEstimatedPose;
         m_kinematics = DriveConstants.kDriveKinematics;

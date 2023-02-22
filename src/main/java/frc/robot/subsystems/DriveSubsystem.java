@@ -46,6 +46,8 @@ public class DriveSubsystem extends SubsystemBase {
   private final AHRS m_gyro = new AHRS();
   private final PhotonCameraWrapper photonWrapper;
 
+  private Pose2d storedPosition;
+
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
       m_gyro.getRotation2d(),
@@ -158,6 +160,14 @@ public class DriveSubsystem extends SubsystemBase {
     m_frontRight.setDesiredState(desiredStates[1]);
     m_rearLeft.setDesiredState(desiredStates[2]);
     m_rearRight.setDesiredState(desiredStates[3]);
+  }
+
+  public Pose2d getStoredPose() {
+    return this.storedPosition;
+  }
+
+  public void setStoredPose(Pose2d pose) {
+    this.storedPosition = pose;
   }
 
   public void zeroHeading() {
