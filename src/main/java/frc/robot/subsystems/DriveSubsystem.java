@@ -12,6 +12,7 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -63,7 +64,7 @@ public class DriveSubsystem extends SubsystemBase {
           m_frontRight.getPosition(),
           m_rearLeft.getPosition(),
           m_rearRight.getPosition()
-      }, getPose());
+      }, m_odometry.getPoseMeters());
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
@@ -116,6 +117,15 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void resetOdometry(Pose2d pose) {
     m_odometry.resetPosition(
+        m_gyro.getRotation2d(),
+        new SwerveModulePosition[] {
+            m_frontLeft.getPosition(),
+            m_frontRight.getPosition(),
+            m_rearLeft.getPosition(),
+            m_rearRight.getPosition()
+        },
+        pose);
+    m_poseEstimator.resetPosition(
         m_gyro.getRotation2d(),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),

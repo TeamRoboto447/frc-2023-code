@@ -145,6 +145,6 @@ public final class Constants {
         new Translation3d(Units.inchesToMeters(3), Units.inchesToMeters(-15), Units.inchesToMeters(26)),
         new Rotation3d(0, 0, 0));
         
-    public static final String cameraName = "photonvision";
+    public static final String cameraName = "Microsoft_LifeCam_HD-3000";
   }
 }
