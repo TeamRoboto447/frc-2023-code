@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.FollowTrajectory;
 import frc.robot.subsystems.DriveSubsystem;
@@ -13,20 +14,30 @@ import frc.robot.utils.AutonUtils;
 import frc.robot.subsystems.ArmSubsystem;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -43,10 +54,11 @@ public class RobotContainer {
   private final ArmSubsystem m_robotArm = new ArmSubsystem();
   private final PowerDistribution PDP = new PowerDistribution(0, ModuleType.kCTRE);
 
+  private Pose2d storedPosition;
+
   Joystick m_driverController = new Joystick(OIConstants.kDriverControllerPort);
   JoystickControl m_joystickControl = new JoystickControl(m_driverController, 0.25, 0.25, -10, -0.333);
   XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
-
 
   public RobotContainer() {
     // Configure the trigger bindings
@@ -88,46 +100,40 @@ public class RobotContainer {
 
         }, m_robotDrive));
 
-    
     m_robotArm.setDefaultCommand(
         new RunCommand(() -> {
 
-
-          if(m_operatorController.getXButton()) {
-            m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY()/4, 0.25));
+          if (m_operatorController.getXButton()) {
+            m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY() / 4, 0.25));
             m_robotArm.goToVertical(ArmConstants.verticalRange);
-            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getRightX()/4, 0.25));
-          }
-          else if(m_operatorController.getYButton()) {
-            m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY()/4, 0.25));
+            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getRightX() / 4, 0.25));
+          } else if (m_operatorController.getYButton()) {
+            m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY() / 4, 0.25));
             m_robotArm.goToVertical(0);
-            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getRightX()/4, 0.25));
+            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getRightX() / 4, 0.25));
             m_robotArm.open();
-          }
-          else if(m_operatorController.getBButton()) {
-            m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY()/4, 0.25));
-            m_robotArm.goToVertical(ArmConstants.verticalRange/4);
-            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getRightX()/4, 0.25));
-          }
-          else if(m_operatorController.getAButton()) {
-            m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY()/4, 0.25));
-            m_robotArm.goToVertical(ArmConstants.verticalRange/2);
-            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getRightX()/4, 0.25));
-          }
-          else {
-            m_robotArm.rawMoveHorizontal(deadzone(-m_operatorController.getRightY()/4, 0.25));
-            m_robotArm.rawMoveVertical(deadzone(-m_operatorController.getLeftY()/4, 0.25));
-            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getRightX()/4, 0.25));
+          } else if (m_operatorController.getBButton()) {
+            m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY() / 4, 0.25));
+            m_robotArm.goToVertical(ArmConstants.verticalRange / 4);
+            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getRightX() / 4, 0.25));
+          } else if (m_operatorController.getAButton()) {
+            m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY() / 4, 0.25));
+            m_robotArm.goToVertical(ArmConstants.verticalRange / 2);
+            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getRightX() / 4, 0.25));
+          } else {
+            m_robotArm.rawMoveHorizontal(deadzone(-m_operatorController.getRightY() / 4, 0.25));
+            m_robotArm.rawMoveVertical(deadzone(-m_operatorController.getLeftY() / 4, 0.25));
+            m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getRightX() / 4, 0.25));
           }
 
-          if(m_operatorController.getLeftBumper())
+          if (m_operatorController.getLeftBumper())
             m_robotArm.extend();
           else if (m_operatorController.getRightBumper())
             m_robotArm.retract();
 
-          if(m_operatorController.getBackButton())
+          if (m_operatorController.getBackButton())
             m_robotArm.open();
-          else if(m_operatorController.getStartButton())
+          else if (m_operatorController.getStartButton())
             m_robotArm.close();
 
         }, m_robotArm));
@@ -144,10 +150,67 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-  }
- 
+    Trigger storePosition = new JoystickButton(m_driverController, 10);
+    Trigger gotoStoredPotion = new JoystickButton(m_driverController, 11);
 
-  // boolean demoAuto = true;
+    storePosition.onTrue(new InstantCommand(() -> {
+      this.storedPosition = m_robotDrive.getEstimatedPose();
+    }, m_robotDrive));
+
+    gotoStoredPotion.onTrue(new CommandBase() {
+      final Timer m_timer = new Timer();
+      Trajectory m_trajectory;
+      Supplier<Pose2d> m_pose;
+      SwerveDriveKinematics m_kinematics;
+      HolonomicDriveController m_controller;
+      Consumer<SwerveModuleState[]> m_outputModuleStates;
+      Supplier<Rotation2d> m_desiredRotation;
+
+      @Override
+      public void initialize() {
+        m_timer.restart();
+        m_trajectory = TrajectoryGenerator.generateTrajectory(
+            m_robotDrive.getEstimatedPose(),
+            List.of(),
+            storedPosition,
+            AutoConstants.trajectoryConfig);
+        m_pose = m_robotDrive::getEstimatedPose;
+        m_kinematics = DriveConstants.kDriveKinematics;
+
+        new HolonomicDriveController(
+            AutoConstants.xController,
+            AutoConstants.yController,
+            AutoConstants.thetaController);
+
+        m_desiredRotation = () -> m_trajectory.getStates().get(m_trajectory.getStates().size() - 1).poseMeters
+            .getRotation();
+        m_outputModuleStates = m_robotDrive::setModuleStates;
+
+        addRequirements(m_robotDrive);
+      }
+
+      @Override
+      public void execute() {
+        double curTime = m_timer.get();
+        var desiredState = m_trajectory.sample(curTime);
+
+        var targetChassisSpeeds = m_controller.calculate(m_pose.get(), desiredState, m_desiredRotation.get());
+        var targetModuleStates = m_kinematics.toSwerveModuleStates(targetChassisSpeeds);
+
+        m_outputModuleStates.accept(targetModuleStates);
+      }
+
+      @Override
+      public void end(boolean interrupted) {
+        m_timer.stop();
+      }
+
+      @Override
+      public boolean isFinished() {
+        return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
+      }
+    });
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -157,26 +220,16 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
 
     Trajectory traj1 = TrajectoryGenerator.generateTrajectory(
-      new Pose2d(0, 0, Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(0))),
-      List.of(), 
-      new Pose2d(0, AutoConstants.unitsPerMeter, Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(90))), // Field orientation, drove left
-      AutoConstants.trajectoryConfig);
+        new Pose2d(0, 0, Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(0))),
+        List.of(),
+        new Pose2d(0, AutoConstants.unitsPerMeter, Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(90))),
+        AutoConstants.trajectoryConfig);
     FollowTrajectory movement1 = new FollowTrajectory(m_robotDrive, traj1, false);
 
-    // Trajectory traj2 = TrajectoryGenerator.generateTrajectory(
-    //   new Pose2d(0, AutoConstants.unitsPerMeter, Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(90))),
-    //   List.of(), 
-    //   new Pose2d(0, 0, Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(0))), // Field orientation, drove left
-    //   AutoConstants.trajectoryConfig);
-    // FollowTrajectory movement2 = new FollowTrajectory(m_robotDrive, traj2, true);
-
-
     return new SequentialCommandGroup(
-      new InstantCommand(() -> m_robotDrive.resetOdometry(AutonUtils.getStartingPose(traj1, m_robotDrive))),
-      movement1,
-      // movement2,
-      new InstantCommand(() -> m_robotDrive.stopModules())
-    );
+        new InstantCommand(() -> m_robotDrive.resetOdometry(AutonUtils.getStartingPose(traj1, m_robotDrive))),
+        movement1,
+        new InstantCommand(() -> m_robotDrive.stopModules()));
   }
 
   protected double deadzone(double val, double deadzone) {
