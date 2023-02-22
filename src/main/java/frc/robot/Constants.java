@@ -31,6 +31,8 @@ public final class Constants {
 
   public static class DriveConstants {
 
+    public static boolean useVisionBasedOdemetryEstimation = false;
+
     public static final int kFrontRightDriveID = 11;
     public static final int kFrontLeftDriveID = 21;
     public static final int kRearLeftDriveID = 31;
