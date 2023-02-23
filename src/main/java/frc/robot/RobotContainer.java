@@ -6,7 +6,6 @@ package frc.robot;
 
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.FollowTrajectory;
 import frc.robot.subsystems.DriveSubsystem;
@@ -14,31 +13,20 @@ import frc.robot.utils.AutonUtils;
 import frc.robot.subsystems.ArmSubsystem;
 
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -151,119 +139,6 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    Trigger gotoChargeStation = new JoystickButton(m_driverController, 11);
-    gotoChargeStation.onTrue(new CommandBase() {
-      final Timer m_timer = new Timer();
-      Trajectory m_trajectory;
-      Supplier<Pose2d> m_pose;
-      SwerveDriveKinematics m_kinematics;
-      HolonomicDriveController m_controller;
-      Consumer<SwerveModuleState[]> m_outputModuleStates;
-      Supplier<Rotation2d> m_desiredRotation;
-
-      @Override
-      public void initialize() {
-        m_timer.restart();
-        m_trajectory = TrajectoryGenerator.generateTrajectory(
-            m_robotDrive.getEstimatedPose(),
-            List.of(),
-            new Pose2d(40.67, 0.19, new Rotation2d(AutonUtils.rotationOffsetCorrection(0))),
-            AutoConstants.trajectoryConfig);
-        m_pose = m_robotDrive::getEstimatedPose;
-        m_kinematics = DriveConstants.kDriveKinematics;
-
-        AutoConstants.thetaController.enableContinuousInput(-Math.PI, Math.PI);
-        
-        m_controller = new HolonomicDriveController(
-            AutoConstants.xController,
-            AutoConstants.yController,
-            AutoConstants.thetaController);
-
-        m_desiredRotation = () -> m_trajectory.getStates().get(m_trajectory.getStates().size() - 1).poseMeters
-            .getRotation();
-        m_outputModuleStates = m_robotDrive::setModuleStates;
-       
-        addRequirements(m_robotDrive);
-      }
-
-      @Override
-      public void execute() {
-        double curTime = m_timer.get();
-        var desiredState = m_trajectory.sample(curTime);
-
-        var targetChassisSpeeds = m_controller.calculate(m_pose.get(), desiredState, m_desiredRotation.get());
-        var targetModuleStates = m_kinematics.toSwerveModuleStates(targetChassisSpeeds);
-
-        m_outputModuleStates.accept(targetModuleStates);
-      }
-
-      @Override
-      public void end(boolean interrupted) {
-        m_timer.stop();
-      }
-
-      @Override
-      public boolean isFinished() {
-        return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
-      }
-    });
-
-    Trigger gotoStartingPosition = new JoystickButton(m_driverController, 12);
-    gotoStartingPosition.onTrue(new CommandBase() {
-      final Timer m_timer = new Timer();
-      Trajectory m_trajectory;
-      Supplier<Pose2d> m_pose;
-      SwerveDriveKinematics m_kinematics;
-      HolonomicDriveController m_controller;
-      Consumer<SwerveModuleState[]> m_outputModuleStates;
-      Supplier<Rotation2d> m_desiredRotation;
-
-      @Override
-      public void initialize() {
-        m_timer.restart();
-        m_trajectory = TrajectoryGenerator.generateTrajectory(
-            m_robotDrive.getEstimatedPose(),
-            List.of(),
-            m_robotDrive.getStoredPose(),
-            AutoConstants.trajectoryConfig);
-        m_pose = m_robotDrive::getEstimatedPose;
-        m_kinematics = DriveConstants.kDriveKinematics;
-
-        AutoConstants.thetaController.enableContinuousInput(-Math.PI, Math.PI);
-        
-        m_controller = new HolonomicDriveController(
-            AutoConstants.xController,
-            AutoConstants.yController,
-            AutoConstants.thetaController);
-
-        m_desiredRotation = () -> m_trajectory.getStates().get(m_trajectory.getStates().size() - 1).poseMeters
-            .getRotation();
-        m_outputModuleStates = m_robotDrive::setModuleStates;
-       
-        addRequirements(m_robotDrive);
-      }
-
-      @Override
-      public void execute() {
-        double curTime = m_timer.get();
-        var desiredState = m_trajectory.sample(curTime);
-
-        var targetChassisSpeeds = m_controller.calculate(m_pose.get(), desiredState, m_desiredRotation.get());
-        var targetModuleStates = m_kinematics.toSwerveModuleStates(targetChassisSpeeds);
-
-        m_outputModuleStates.accept(targetModuleStates);
-      }
-
-      @Override
-      public void end(boolean interrupted) {
-        m_timer.stop();
-      }
-
-      @Override
-      public boolean isFinished() {
-        return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
-      }
-    });
   }
 
   /**
@@ -272,13 +147,18 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    
+    m_robotDrive.updateEstimationFromVision();
+
+    Pose2d startingPose = m_robotDrive.getEstimatedPose();
 
     Trajectory traj1 = TrajectoryGenerator.generateTrajectory(
-        new Pose2d(0, 0, Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(0))),
+        startingPose,
         List.of(),
-        new Pose2d(0, AutoConstants.unitsPerMeter, Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(90))),
+        new Pose2d(40.67, 0.19, new Rotation2d(AutonUtils.rotationOffsetCorrection(0))),
         AutoConstants.trajectoryConfig);
-    FollowTrajectory movement1 = new FollowTrajectory(m_robotDrive, traj1, false);
+
+    FollowTrajectory movement1 = new FollowTrajectory(m_robotDrive, traj1, true);
 
     return new SequentialCommandGroup(
         new InstantCommand(() -> m_robotDrive.resetOdometry(AutonUtils.getStartingPose(traj1, m_robotDrive))),
