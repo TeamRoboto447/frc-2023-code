@@ -174,8 +174,8 @@ public class RobotContainer {
             AutoConstants.trajectoryConfig);
         m_pose = m_robotDrive::getEstimatedPose;
         m_kinematics = DriveConstants.kDriveKinematics;
-
-        new HolonomicDriveController(
+        AutoConstants.thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        m_controller = new HolonomicDriveController(
             AutoConstants.xController,
             AutoConstants.yController,
             AutoConstants.thetaController);
@@ -183,7 +183,7 @@ public class RobotContainer {
         m_desiredRotation = () -> m_trajectory.getStates().get(m_trajectory.getStates().size() - 1).poseMeters
             .getRotation();
         m_outputModuleStates = m_robotDrive::setModuleStates;
-
+       
         addRequirements(m_robotDrive);
       }
 
