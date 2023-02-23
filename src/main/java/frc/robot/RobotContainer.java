@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -98,6 +99,8 @@ public class RobotContainer {
 
         }, m_robotDrive));
 
+    m_robotDrive.setStoredPose(m_robotDrive.getEstimatedPose());
+
     m_robotArm.setDefaultCommand(
         new RunCommand(() -> {
 
@@ -148,14 +151,65 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    Trigger storePosition = new JoystickButton(m_driverController, 11);
-    Trigger gotoStoredPotion = new JoystickButton(m_driverController, 12);
+    Trigger gotoChargeStation = new JoystickButton(m_driverController, 11);
+    gotoChargeStation.onTrue(new CommandBase() {
+      final Timer m_timer = new Timer();
+      Trajectory m_trajectory;
+      Supplier<Pose2d> m_pose;
+      SwerveDriveKinematics m_kinematics;
+      HolonomicDriveController m_controller;
+      Consumer<SwerveModuleState[]> m_outputModuleStates;
+      Supplier<Rotation2d> m_desiredRotation;
 
-    storePosition.onTrue(new InstantCommand(() -> {
-      m_robotDrive.setStoredPose(m_robotDrive.getEstimatedPose());
-    }, m_robotDrive));
+      @Override
+      public void initialize() {
+        m_timer.restart();
+        m_trajectory = TrajectoryGenerator.generateTrajectory(
+            m_robotDrive.getEstimatedPose(),
+            List.of(),
+            new Pose2d(40.67, 0.19, new Rotation2d(AutonUtils.rotationOffsetCorrection(0))),
+            AutoConstants.trajectoryConfig);
+        m_pose = m_robotDrive::getEstimatedPose;
+        m_kinematics = DriveConstants.kDriveKinematics;
 
-    gotoStoredPotion.onTrue(new CommandBase() {
+        AutoConstants.thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        
+        m_controller = new HolonomicDriveController(
+            AutoConstants.xController,
+            AutoConstants.yController,
+            AutoConstants.thetaController);
+
+        m_desiredRotation = () -> m_trajectory.getStates().get(m_trajectory.getStates().size() - 1).poseMeters
+            .getRotation();
+        m_outputModuleStates = m_robotDrive::setModuleStates;
+       
+        addRequirements(m_robotDrive);
+      }
+
+      @Override
+      public void execute() {
+        double curTime = m_timer.get();
+        var desiredState = m_trajectory.sample(curTime);
+
+        var targetChassisSpeeds = m_controller.calculate(m_pose.get(), desiredState, m_desiredRotation.get());
+        var targetModuleStates = m_kinematics.toSwerveModuleStates(targetChassisSpeeds);
+
+        m_outputModuleStates.accept(targetModuleStates);
+      }
+
+      @Override
+      public void end(boolean interrupted) {
+        m_timer.stop();
+      }
+
+      @Override
+      public boolean isFinished() {
+        return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
+      }
+    });
+
+    Trigger gotoStartingPosition = new JoystickButton(m_driverController, 12);
+    gotoStartingPosition.onTrue(new CommandBase() {
       final Timer m_timer = new Timer();
       Trajectory m_trajectory;
       Supplier<Pose2d> m_pose;
@@ -174,7 +228,9 @@ public class RobotContainer {
             AutoConstants.trajectoryConfig);
         m_pose = m_robotDrive::getEstimatedPose;
         m_kinematics = DriveConstants.kDriveKinematics;
+
         AutoConstants.thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        
         m_controller = new HolonomicDriveController(
             AutoConstants.xController,
             AutoConstants.yController,

@@ -72,8 +72,7 @@ public class DriveSubsystem extends SubsystemBase {
   public DriveSubsystem() {
     photonWrapper = new PhotonCameraWrapper();
     m_gyro.setAngleAdjustment(DriveConstants.angleOffset);
-    m_odometry.update(
-        m_gyro.getRotation2d(),
+    update(
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
