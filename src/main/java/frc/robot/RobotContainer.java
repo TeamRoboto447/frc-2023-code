@@ -14,7 +14,6 @@ import frc.robot.subsystems.ArmSubsystem;
 
 import java.util.List;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.util.Units;
@@ -53,6 +52,7 @@ public class RobotContainer {
 
     m_robotDrive.setDefaultCommand(
         new RunCommand(() -> {
+          m_robotDrive.setBreakMode(false);
 
           if (m_driverController.getRawButton(5)) {
             m_robotDrive.drive(
@@ -87,7 +87,6 @@ public class RobotContainer {
 
         }, m_robotDrive));
 
-    m_robotDrive.setStoredPose(m_robotDrive.getEstimatedPose());
 
     m_robotArm.setDefaultCommand(
         new RunCommand(() -> {

@@ -1,9 +1,11 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -81,6 +83,11 @@ public class SwerveModule {
         
         m_driveMotor.set(driveOutput);
         m_turningMotor.set(turnOutput);
+    }
+
+    public void setBrakeMode(boolean breakMode) {
+        this.m_turningMotor.setIdleMode(breakMode ? IdleMode.kBrake : IdleMode.kCoast);
+        this.m_driveMotor.setNeutralMode(breakMode ? NeutralMode.Brake : NeutralMode.Coast);
     }
 
     public void stop() {

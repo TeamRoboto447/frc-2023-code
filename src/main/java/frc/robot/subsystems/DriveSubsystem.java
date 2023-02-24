@@ -160,13 +160,12 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearLeft.setDesiredState(desiredStates[2]);
     m_rearRight.setDesiredState(desiredStates[3]);
   }
-
-  public Pose2d getStoredPose() {
-    return this.storedPosition;
-  }
-
-  public void setStoredPose(Pose2d pose) {
-    this.storedPosition = pose;
+  
+  public void setBreakMode(boolean breakMode) {
+    m_frontLeft.setBreakMode(breakMode);
+    m_frontRight.setBreakMode(breakMode);
+    m_rearLeft.setBreakMode(breakMode);
+    m_rearRight.setBreakMode(breakMode);
   }
 
   public void zeroHeading() {
