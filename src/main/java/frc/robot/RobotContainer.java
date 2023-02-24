@@ -52,7 +52,7 @@ public class RobotContainer {
 
     m_robotDrive.setDefaultCommand(
         new RunCommand(() -> {
-          m_robotDrive.setBreakMode(false);
+          m_robotDrive.setBrakeMode(false);
 
           if (m_driverController.getRawButton(5)) {
             m_robotDrive.drive(

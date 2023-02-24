@@ -12,7 +12,6 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -45,8 +44,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   private final AHRS m_gyro = new AHRS();
   private final PhotonCameraWrapper photonWrapper;
-
-  private Pose2d storedPosition;
 
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
@@ -161,11 +158,12 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(desiredStates[3]);
   }
   
-  public void setBreakMode(boolean breakMode) {
-    m_frontLeft.setBrakeMode(breakMode);
-    m_frontRight.setBrakeMode(breakMode);
-    m_rearLeft.setBrakeMode(breakMode);
-    m_rearRight.setBrakeMode(breakMode);
+
+  public void setBrakeMode(boolean brakeMode) {
+    m_frontLeft.setBrakeMode(brakeMode);
+    m_frontRight.setBrakeMode(brakeMode);
+    m_rearLeft.setBrakeMode(brakeMode);
+    m_rearRight.setBrakeMode(brakeMode);
   }
 
   public void zeroHeading() {
