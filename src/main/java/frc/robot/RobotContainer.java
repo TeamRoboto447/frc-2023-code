@@ -152,18 +152,28 @@ public class RobotContainer {
     m_robotDrive.updateEstimationFromVision();
 
     Pose2d startingPose = m_robotDrive.getEstimatedPose();
-
     Trajectory traj1 = TrajectoryGenerator.generateTrajectory(
         startingPose,
         List.of(),
-        new Pose2d(Units.feetToMeters(4), Units.feetToMeters(5.7), Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(0))),
+        new Pose2d(Units.feetToMeters(4), Units.feetToMeters(5.7), startingPose.getRotation()),
         AutoConstants.trajectoryConfig);
 
-    FollowTrajectory movement1 = new FollowTrajectory(m_robotDrive, traj1, true);
+    FollowTrajectory movement1 = new FollowTrajectory(m_robotDrive, traj1, Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(0)), true);
+
+    // startingPose = m_robotDrive.getEstimatedPose();
+    // Trajectory traj2 = TrajectoryGenerator.generateTrajectory(
+    //     startingPose,
+    //     List.of(),
+    //     new Pose2d(Units.feetToMeters(4), Units.feetToMeters(5.7), startingPose.getRotation()),
+    //     AutoConstants.trajectoryConfig);
+
+    // FollowTrajectory movement2 = new FollowTrajectory(m_robotDrive, traj2, Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(180)), true);
+
 
     return new SequentialCommandGroup(
         new InstantCommand(() -> m_robotDrive.resetOdometry(AutonUtils.getStartingPose(traj1, m_robotDrive))),
         movement1,
+        // movement2,
         new InstantCommand(() -> m_robotDrive.stopModules()));
   }
 
