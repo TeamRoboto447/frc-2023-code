@@ -161,11 +161,11 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(desiredStates[3]);
   }
   
-  public void setBrakeMode(boolean breakMode) {
-    m_frontLeft.setBrakeMode(breakMode);
-    m_frontRight.setBrakeMode(breakMode);
-    m_rearLeft.setBrakeMode(breakMode);
-    m_rearRight.setBrakeMode(breakMode);
+  public void setBrakeMode(boolean brakeMode) {
+    m_frontLeft.setBrakeMode(brakeMode);
+    m_frontRight.setBrakeMode(brakeMode);
+    m_rearLeft.setBrakeMode(brakeMode);
+    m_rearRight.setBrakeMode(brakeMode);
   }
 
   public void zeroHeading() {
