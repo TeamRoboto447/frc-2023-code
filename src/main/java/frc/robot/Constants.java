@@ -126,8 +126,8 @@ public final class Constants {
   public static final class AutoConstants {
     public static final TrajectoryConfig trajectoryConfig = new TrajectoryConfig(20, 10)
         .setKinematics(DriveConstants.kDriveKinematics);
-    public static PIDController xController = new PIDController(1.5, 0, 0);
-    public static PIDController yController = new PIDController(1.5, 0, 0);
+    public static PIDController xController = new PIDController(19, 0, 0);
+    public static PIDController yController = new PIDController(10, 0, 0);
     public static ProfiledPIDController thetaController = new ProfiledPIDController(
         0.75,
         0,

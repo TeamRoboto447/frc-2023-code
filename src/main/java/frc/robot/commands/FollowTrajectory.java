@@ -43,7 +43,7 @@ public class FollowTrajectory extends SwerveControllerCommand {
   public void end(boolean interrupted) {
     super.end(interrupted);
     if(this.finalMovement) {
-      this.driveSubsystem.setBreakMode(true);
+      this.driveSubsystem.setBrakeMode(true);
       this.driveSubsystem.stopModules();
     }
   }

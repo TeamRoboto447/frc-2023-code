@@ -14,6 +14,8 @@ import frc.robot.subsystems.ArmSubsystem;
 
 import java.util.List;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.util.Units;
@@ -154,7 +156,7 @@ public class RobotContainer {
     Trajectory traj1 = TrajectoryGenerator.generateTrajectory(
         startingPose,
         List.of(),
-        new Pose2d(Units.feetToMeters(43.2), Units.feetToMeters(-2), startingPose.getRotation()),
+        new Pose2d(Units.feetToMeters(4), Units.feetToMeters(5.7), Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(0))),
         AutoConstants.trajectoryConfig);
 
     FollowTrajectory movement1 = new FollowTrajectory(m_robotDrive, traj1, true);
