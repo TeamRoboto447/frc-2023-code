@@ -34,6 +34,7 @@ public class FollowTrajectory extends SwerveControllerCommand {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    this.driveSubsystem.updateEstimationFromVision();
     super.execute();
   }
 

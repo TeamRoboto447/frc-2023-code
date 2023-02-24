@@ -155,7 +155,7 @@ public class RobotContainer {
     Trajectory traj1 = TrajectoryGenerator.generateTrajectory(
         startingPose,
         List.of(),
-        new Pose2d(40.67, 0.19, new Rotation2d(AutonUtils.rotationOffsetCorrection(0))),
+        new Pose2d(Units.feetToMeters(36.7), Units.feetToMeters(1.54), startingPose.getRotation()),
         AutoConstants.trajectoryConfig);
 
     FollowTrajectory movement1 = new FollowTrajectory(m_robotDrive, traj1, true);

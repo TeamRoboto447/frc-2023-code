@@ -31,7 +31,7 @@ public final class Constants {
 
   public static class DriveConstants {
 
-    public static boolean useVisionBasedOdemetryEstimation = false;
+    public static boolean useVisionBasedOdemetryEstimation = true;
 
     public static final int kFrontRightDriveID = 11;
     public static final int kFrontLeftDriveID = 21;
@@ -64,7 +64,7 @@ public final class Constants {
 
     public static final double kMaxSpeedMetersPerSecond = 30;
 
-    public static final double angleOffset = -90;
+    public static final double angleOffset = 90;
   }
 
   public static class ModuleConstants {
@@ -126,8 +126,8 @@ public final class Constants {
   public static final class AutoConstants {
     public static final TrajectoryConfig trajectoryConfig = new TrajectoryConfig(20, 10)
         .setKinematics(DriveConstants.kDriveKinematics);
-    public static PIDController xController = new PIDController(2, 0, 0);
-    public static PIDController yController = new PIDController(2, 0, 0);
+    public static PIDController xController = new PIDController(1.5, .2, 0);
+    public static PIDController yController = new PIDController(1.5, .2, 0);
     public static ProfiledPIDController thetaController = new ProfiledPIDController(
         0.75,
         0,
