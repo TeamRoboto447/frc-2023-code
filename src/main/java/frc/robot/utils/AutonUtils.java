@@ -3,21 +3,25 @@ package frc.robot.utils;
 import java.util.List;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.commands.FollowTrajectory;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class AutonUtils {
-    public static Trajectory getTrajectory(Script script, int step) {
+    public static Trajectory getTrajectory(Script script, Pose2d startingPos, int step) {
         switch (script) {
             case SCORE_AND_CHARGE:
-                return getScoreAndChargeStep(step);
-            case DEMO_SCRIPT_1:
-                return getDemo1Step(step);
+                return getScoreAndChargeStep(startingPos, step);
+            case LEAVE_COMMUNITY_AND_CHARGE:
+                return getLeaveCommunityAndChargeStep(startingPos, step);
             default:
                 System.out.println("How did we get here?");
                 return null;
@@ -25,41 +29,73 @@ public class AutonUtils {
     }
 
     public static Pose2d getStartingPose(Trajectory traj, DriveSubsystem driveSubsystem) {
-        return new Pose2d(traj.getInitialPose().getX(), traj.getInitialPose().getY(), driveSubsystem.getPose().getRotation());
+        return new Pose2d(traj.getInitialPose().getX(), traj.getInitialPose().getY(),
+                driveSubsystem.getPose().getRotation());
     }
 
     public static double rotationOffsetCorrection(double target) {
         return target + DriveConstants.angleOffset;
     }
 
-    private static Trajectory getScoreAndChargeStep(int step) {
-        switch(step) {
-            default: return null;
+    private static Trajectory getScoreAndChargeStep(Pose2d startingPos, int step) {
+        switch (step) {
+            default:
+                return null;
         }
     }
 
-    private static Trajectory getDemo1Step(int step) {
+    private static Trajectory getLeaveCommunityAndChargeStep(Pose2d startingPose, int step) {
         switch (step) {
             case 1:
                 return TrajectoryGenerator.generateTrajectory(
-                        new Pose2d(0, 0, new Rotation2d(0)),
-                        List.of(
-                                new Translation2d(-0.5, 0.1)),
-                        new Pose2d(-1, 0, Rotation2d.fromDegrees(90)),
+                        startingPose,
+                        List.of(),
+                        new Pose2d(Units.feetToMeters(40), Units.feetToMeters(9), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
             case 2:
                 return TrajectoryGenerator.generateTrajectory(
-                        new Pose2d(-1, 0, new Rotation2d(90)),
-                        List.of(
-                                new Translation2d(-1.1, -1)),
-                        new Pose2d(-1, -2, Rotation2d.fromDegrees(-90)),
+                        startingPose,
+                        List.of(),
+                        new Pose2d(Units.feetToMeters(39), Units.feetToMeters(2), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
-            default: return null;
+            default:
+                return null;
         }
+    }
+
+    public static Command getCommandScript(RobotContainer container, Script script) {
+        Pose2d startingPose = container.m_robotDrive.getEstimatedPose(); // Setup starting pose
+        Trajectory traj1 = AutonUtils.getTrajectory(Script.LEAVE_COMMUNITY_AND_CHARGE, startingPose, 1); // Get first
+                                                                                                         // movement
+                                                                                                         // trajectory
+        FollowTrajectory movement1 = new FollowTrajectory(container.m_robotDrive, traj1, startingPose.getRotation(),
+                false); // Create a new movement command for the first movement
+
+        startingPose = new Pose2d(Units.feetToMeters(40), Units.feetToMeters(9), startingPose.getRotation()); // Update
+                                                                                                              // starting
+                                                                                                              // pose
+                                                                                                              // for
+                                                                                                              // next
+                                                                                                              // movement
+        Trajectory traj2 = AutonUtils.getTrajectory(Script.LEAVE_COMMUNITY_AND_CHARGE, startingPose, 2); // Get second
+                                                                                                         // movement
+                                                                                                         // trajectory
+        FollowTrajectory movement2 = new FollowTrajectory(container.m_robotDrive, traj2, startingPose.getRotation(),
+                true); // Create a new movement command for the second movement
+
+        return new SequentialCommandGroup( // This runs the movements in order
+                new InstantCommand(
+                        () -> container.m_robotDrive.resetOdometry(
+                                AutonUtils.getStartingPose(traj1, container.m_robotDrive))), // Ensure the robot is where it
+                                                                                   // thinks it is if dead reckoning
+                movement1, //
+                movement2,
+                new InstantCommand(
+                        () -> container.m_robotDrive.stopModules()));
     }
 
     public static enum Script {
         SCORE_AND_CHARGE,
-        DEMO_SCRIPT_1
+        LEAVE_COMMUNITY_AND_CHARGE
     }
 }

@@ -99,6 +99,10 @@ public class DriveSubsystem extends SubsystemBase {
   public Pose2d getPose() {
     return DriveConstants.useVisionBasedOdemetryEstimation ? getEstimatedPose() : m_odometry.getPoseMeters();
   }
+  
+  public Pose2d getRawOdometryPose() {
+    return m_odometry.getPoseMeters();
+  }
 
   public Pose2d getEstimatedPose() {
     return m_poseEstimator.getEstimatedPosition();
@@ -123,6 +127,7 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearRight.getPosition()
         },
         pose);
+
     m_poseEstimator.resetPosition(
         m_gyro.getRotation2d(),
         new SwerveModulePosition[] {

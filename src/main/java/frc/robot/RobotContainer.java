@@ -5,19 +5,12 @@
 package frc.robot;
 
 import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.FollowTrajectory;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.utils.AutonUtils;
+import frc.robot.utils.AutonUtils.Script;
 import frc.robot.subsystems.ArmSubsystem;
 
-import java.util.List;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -25,9 +18,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -40,7 +32,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
  */
 public class RobotContainer {
 
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  public final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ArmSubsystem m_robotArm = new ArmSubsystem();
   private final PowerDistribution PDP = new PowerDistribution(0, ModuleType.kCTRE);
 
@@ -81,18 +73,12 @@ public class RobotContainer {
                 true);
           }
 
-          SmartDashboard.putNumber("X Coord", Units.metersToFeet(m_robotDrive.getPose().getX()));
-          SmartDashboard.putNumber("Y Coord", Units.metersToFeet(m_robotDrive.getPose().getY()));
-
-          SmartDashboard.putNumber("Estimated X Coord", Units.metersToFeet(m_robotDrive.getEstimatedPose().getX()));
-          SmartDashboard.putNumber("Estimated Y Coord", Units.metersToFeet(m_robotDrive.getEstimatedPose().getY()));
+          updateSmartdashboard();
 
         }, m_robotDrive));
 
-
     m_robotArm.setDefaultCommand(
         new RunCommand(() -> {
-
           if (m_operatorController.getXButton()) {
             m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY() / 4, 0.25));
             m_robotArm.goToVertical(ArmConstants.verticalRange);
@@ -112,7 +98,7 @@ public class RobotContainer {
             m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getRightX() / 4, 0.25));
           } else {
             m_robotArm.rawMoveHorizontal(deadzone(-m_operatorController.getRightY() / 4, 0.25));
-            m_robotArm.rawMoveVertical(deadzone(-m_operatorController.getLeftY() / 4, 0.25));
+            m_robotArm.teleopMoveVertical(deadzone(-m_operatorController.getLeftY() / 4, 0.25));
             m_robotArm.rawRotateGrabber(deadzone(m_operatorController.getRightX() / 4, 0.25));
           }
 
@@ -139,6 +125,15 @@ public class RobotContainer {
     return m_driverController.getRawButton(2);
   }
 
+  private void updateSmartdashboard() {
+    SmartDashboard.putNumber("Raw Odometry X Coord", Units.metersToFeet(m_robotDrive.getRawOdometryPose().getX()));
+    SmartDashboard.putNumber("Raw Odometry Y Coord", Units.metersToFeet(m_robotDrive.getRawOdometryPose().getY()));
+    SmartDashboard.putNumber("Processing X Coord", Units.metersToFeet(m_robotDrive.getPose().getX()));
+    SmartDashboard.putNumber("Processing Y Coord", Units.metersToFeet(m_robotDrive.getPose().getY()));
+    SmartDashboard.putNumber("Estimated X Coord", Units.metersToFeet(m_robotDrive.getEstimatedPose().getX()));
+    SmartDashboard.putNumber("Estimated Y Coord", Units.metersToFeet(m_robotDrive.getEstimatedPose().getY()));
+  }
+
   private void configureBindings() {
   }
 
@@ -148,33 +143,12 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    
+
     m_robotDrive.updateEstimationFromVision();
 
-    Pose2d startingPose = m_robotDrive.getEstimatedPose();
-    Trajectory traj1 = TrajectoryGenerator.generateTrajectory(
-        startingPose,
-        List.of(),
-        new Pose2d(Units.feetToMeters(40), Units.feetToMeters(9), startingPose.getRotation()),
-        AutoConstants.trajectoryConfig);
-
-    FollowTrajectory movement1 = new FollowTrajectory(m_robotDrive, traj1, startingPose.getRotation(), false);
-
-     startingPose =  new Pose2d(Units.feetToMeters(40), Units.feetToMeters(9), startingPose.getRotation());
-     Trajectory traj2 = TrajectoryGenerator.generateTrajectory(
-         startingPose,
-         List.of(),
-         new Pose2d(Units.feetToMeters(39), Units.feetToMeters(2), startingPose.getRotation()),
-         AutoConstants.trajectoryConfig);
-
-     FollowTrajectory movement2 = new FollowTrajectory(m_robotDrive, traj2, startingPose.getRotation(), true);
-
-
-    return new SequentialCommandGroup(
-        new InstantCommand(() -> m_robotDrive.resetOdometry(AutonUtils.getStartingPose(traj1, m_robotDrive))),
-        movement1,
-        movement2,
-        new InstantCommand(() -> m_robotDrive.stopModules()));
+    return new ParallelRaceGroup( // Parallel Race Group runs commands in parallel, when one ends, they all end.
+        new RunCommand(() -> updateSmartdashboard()), // This just runs a command that never ends and just updates the  dashboard during auto
+        AutonUtils.getCommandScript(this, Script.LEAVE_COMMUNITY_AND_CHARGE));
   }
 
   protected double deadzone(double val, double deadzone) {

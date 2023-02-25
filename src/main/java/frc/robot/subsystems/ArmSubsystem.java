@@ -29,6 +29,8 @@ public class ArmSubsystem extends SubsystemBase {
     private final double speedScaleFactor = 1.2;
     private final double rotationalspeedScaleFactor = 0.2;
 
+    private double lastVertTeleopPos = 0;
+
     private double maxPIDOutput = 1;
     private double currentHeightTarget = 0;
     private double vMargin = 0.4;
@@ -36,9 +38,12 @@ public class ArmSubsystem extends SubsystemBase {
     private double hMargin = 0.4;
     private double currentRotTarget = 0;
     private double rMargin = 0.4;
-    private final PIDController m_armVerticalPositionController = new PIDController(ArmConstants.kPArmVerticalController, ArmConstants.kIArmVerticalController, 0);
-    private final PIDController m_armHorizontalPositionController = new PIDController(ArmConstants.kPArmHorizontalController, ArmConstants.kIArmHorizontalController, 0);
-    private final PIDController m_armRotationalController = new PIDController(ArmConstants.kPArmRotationalController, 0, 0);
+    private final PIDController m_armVerticalPositionController = new PIDController(
+            ArmConstants.kPArmVerticalController, ArmConstants.kIArmVerticalController, 0);
+    private final PIDController m_armHorizontalPositionController = new PIDController(
+            ArmConstants.kPArmHorizontalController, ArmConstants.kIArmHorizontalController, 0);
+    private final PIDController m_armRotationalController = new PIDController(ArmConstants.kPArmRotationalController, 0,
+            0);
 
     public ArmSubsystem() {
         this.verticalMotor = new CANSparkMax(ArmConstants.verticalMotor, MotorType.kBrushless);
@@ -63,16 +68,19 @@ public class ArmSubsystem extends SubsystemBase {
 
     public void moveVertical(double speed) {
         currentHeightTarget += speed * speedScaleFactor;
+        this.setLastVertTeleopPos(currentHeightTarget);
         runVertical();
     }
 
     public boolean goToVertical(double target) {
         currentHeightTarget = Double.isNaN(target) ? currentHeightTarget : target;
+        this.setLastVertTeleopPos(currentHeightTarget);
         runVertical();
         return m_armVerticalPositionController.atSetpoint();
     }
 
     public void holdVertical() {
+        currentHeightTarget = lastVertTeleopPos;
         runVertical();
     }
 
@@ -83,7 +91,8 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public void moveHorizontal(double speed) {
-        currentDistTarget += speed * speedScaleFactor;;
+        currentDistTarget += speed * speedScaleFactor;
+        ;
         runHorizontal();
     }
 
@@ -128,18 +137,26 @@ public class ArmSubsystem extends SubsystemBase {
         this.rawRotateGrabber(targetSpeed);
     }
 
+    public void teleopMoveVertical(double speed) {
+        if (Math.abs(speed) > 0) {
+            this.rawMoveVertical(speed);
+            this.setLastVertTeleopPos(this.getVertEncoder());
+        } else
+            this.holdVertical();
+    }
+
     public void rawMoveVertical(double speed) {
         this.verticalMotor.set(speed);
-       if(Math.abs(speed)>0)
-        this.armBrake.set(true);
-       else
-        this.armBrake.set(false);
+        if (Math.abs(speed) > 0)
+            this.armBrake.set(true);
+        else
+            this.armBrake.set(false);
     }
-    
+
     public void rawMoveHorizontal(double speed) {
         this.horizontalMotor.set(speed);
     }
-    
+
     public void rawRotateGrabber(double speed) {
         this.rotationalMotor.set(speed);
     }
@@ -190,15 +207,26 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     private double clampedVerticalCalculate() {
-        return MathUtil.clamp(m_armVerticalPositionController.calculate(this.verticalMotor.getEncoder().getPosition(), currentHeightTarget), -this.maxPIDOutput, this.maxPIDOutput);
+        return MathUtil.clamp(m_armVerticalPositionController.calculate(this.verticalMotor.getEncoder().getPosition(),
+                currentHeightTarget), -this.maxPIDOutput, this.maxPIDOutput);
     }
 
     private double clampedHorizontalCalculate() {
-        return MathUtil.clamp(m_armVerticalPositionController.calculate(this.horizontalMotor.getEncoder().getPosition(), currentDistTarget), -this.maxPIDOutput, this.maxPIDOutput);
+        return MathUtil.clamp(m_armVerticalPositionController.calculate(this.horizontalMotor.getEncoder().getPosition(),
+                currentDistTarget), -this.maxPIDOutput, this.maxPIDOutput);
     }
 
     private double clampedRotationalCalculate() {
-        return MathUtil.clamp(this.m_armRotationalController.calculate(this.rotationalMotor.getEncoder().getPosition(), this.currentRotTarget), -this.maxPIDOutput, this.maxPIDOutput);
+        return MathUtil.clamp(this.m_armRotationalController.calculate(this.rotationalMotor.getEncoder().getPosition(),
+                this.currentRotTarget), -this.maxPIDOutput, this.maxPIDOutput);
+    }
+
+    public void setLastVertTeleopPos(double pos) {
+        this.lastVertTeleopPos = pos;
+    }
+
+    public double getVertEncoder() {
+        return this.verticalMotor.getEncoder().getPosition();
     }
 
 }
