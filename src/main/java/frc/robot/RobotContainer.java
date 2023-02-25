@@ -147,8 +147,8 @@ public class RobotContainer {
     m_robotDrive.updateEstimationFromVision();
 
     return new ParallelRaceGroup( // Parallel Race Group runs commands in parallel, when one ends, they all end.
-        new RunCommand(() -> updateSmartdashboard()), // This just runs a command that never ends and just updates the  dashboard during auto
-        AutonUtils.getCommandScript(this, Script.LEAVE_COMMUNITY_AND_CHARGE));
+        new RunCommand(() -> updateSmartdashboard()), // This just runs a command that never ends and just updates the dashboard during auto
+        AutonUtils.getCommandScript(this, Script.LEAVE_COMMUNITY_AND_CHARGE)); // This gets the autonomous script (usually a sequential command group)
   }
 
   protected double deadzone(double val, double deadzone) {
