@@ -123,8 +123,10 @@ public final class Constants {
     static final double width = Units.feetToMeters(27);
   }
 
+  
   public static final class AutoConstants {
-    public static final TrajectoryConfig trajectoryConfig = new TrajectoryConfig(20, 10)
+    public static final TrajectoryConfig trajectoryConfig = new TrajectoryConfig(20, 10
+    )
         .setKinematics(DriveConstants.kDriveKinematics);
     public static PIDController xController = new PIDController(19, 0, 0);
     public static PIDController yController = new PIDController(10, 0, 0);
@@ -145,6 +147,6 @@ public final class Constants {
         new Translation3d(Units.inchesToMeters(-4.75), Units.inchesToMeters(2.75), Units.inchesToMeters(13)),
         new Rotation3d(0, 0, 0));
         
-    public static final String cameraName = "Microsoft_LifeCam_HD-3000";
+    public static final String cameraName = "PSI_Cam";
   }
 }

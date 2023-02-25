@@ -155,25 +155,25 @@ public class RobotContainer {
     Trajectory traj1 = TrajectoryGenerator.generateTrajectory(
         startingPose,
         List.of(),
-        new Pose2d(Units.feetToMeters(4), Units.feetToMeters(5.7), startingPose.getRotation()),
+        new Pose2d(Units.feetToMeters(40), Units.feetToMeters(9), startingPose.getRotation()),
         AutoConstants.trajectoryConfig);
 
-    FollowTrajectory movement1 = new FollowTrajectory(m_robotDrive, traj1, Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(0)), true);
+    FollowTrajectory movement1 = new FollowTrajectory(m_robotDrive, traj1, startingPose.getRotation(), false);
 
-    // startingPose = m_robotDrive.getEstimatedPose();
-    // Trajectory traj2 = TrajectoryGenerator.generateTrajectory(
-    //     startingPose,
-    //     List.of(),
-    //     new Pose2d(Units.feetToMeters(4), Units.feetToMeters(5.7), startingPose.getRotation()),
-    //     AutoConstants.trajectoryConfig);
+     startingPose =  new Pose2d(Units.feetToMeters(40), Units.feetToMeters(9), startingPose.getRotation());
+     Trajectory traj2 = TrajectoryGenerator.generateTrajectory(
+         startingPose,
+         List.of(),
+         new Pose2d(Units.feetToMeters(39), Units.feetToMeters(2), startingPose.getRotation()),
+         AutoConstants.trajectoryConfig);
 
-    // FollowTrajectory movement2 = new FollowTrajectory(m_robotDrive, traj2, Rotation2d.fromDegrees(AutonUtils.rotationOffsetCorrection(180)), true);
+     FollowTrajectory movement2 = new FollowTrajectory(m_robotDrive, traj2, startingPose.getRotation(), true);
 
 
     return new SequentialCommandGroup(
         new InstantCommand(() -> m_robotDrive.resetOdometry(AutonUtils.getStartingPose(traj1, m_robotDrive))),
         movement1,
-        // movement2,
+        movement2,
         new InstantCommand(() -> m_robotDrive.stopModules()));
   }
 
