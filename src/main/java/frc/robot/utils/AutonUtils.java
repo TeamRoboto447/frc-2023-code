@@ -13,6 +13,7 @@ import frc.robot.RobotContainer;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.FollowTrajectory;
+import frc.robot.commands.MoveArmToPosition;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class AutonUtils {
@@ -50,13 +51,13 @@ public class AutonUtils {
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(4), Units.feetToMeters(0), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(40), Units.feetToMeters(9), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
             case 2:
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(34), Units.feetToMeters(-2), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(39), Units.feetToMeters(2), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
             default:
                 return null;
@@ -73,23 +74,23 @@ public class AutonUtils {
                 container.m_robotDrive,
                 traj1,
                 startingPose.getRotation(),
-                true); // Create a new movement command for the first movement
+                false); // Create a new movement command for the first movement
 
         startingPose = new Pose2d(
-                Units.feetToMeters(45),
-                Units.feetToMeters(10),
+                Units.feetToMeters(40),
+                Units.feetToMeters(9),
                 startingPose.getRotation()); // Update starting pose for next movement
 
-        Trajectory traj2 = AutonUtils.getTrajectory(
-                Script.LEAVE_COMMUNITY_AND_CHARGE,
-                startingPose,
-                2); // Get second movement trajectory
+        // Trajectory traj2 = AutonUtils.getTrajectory(
+        //         Script.LEAVE_COMMUNITY_AND_CHARGE,
+        //         startingPose,
+        //         2); // Get second movement trajectory
 
-        FollowTrajectory movement2 = new FollowTrajectory(
-                container.m_robotDrive,
-                traj2,
-                startingPose.getRotation(),
-                true); // Create a new movement command for the second movement
+        // FollowTrajectory movement2 = new FollowTrajectory(
+        //         container.m_robotDrive,
+        //         traj2,
+        //         startingPose.getRotation(),
+        //         true); // Create a new movement command for the second movement
 
         return new SequentialCommandGroup( // This runs the movements in order
                 new InstantCommand(
@@ -99,7 +100,8 @@ public class AutonUtils {
                                         container.m_robotDrive))), // Ensure the robot is where it thinks it is if dead
                                                                    // reckoning
                 movement1, // Do First Movement
-              //  movement2, // Do Second Movement
+                // movement2, // Do Second Movement
+                new MoveArmToPosition(container.m_robotArm, Double.NaN, Double.NaN, Double.NaN), // NaN = don't move
                 new InstantCommand(
                         () -> container.m_robotDrive.stopModules())); // Endure Robot Is Stopped
     }

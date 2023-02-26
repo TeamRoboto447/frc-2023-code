@@ -33,7 +33,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 public class RobotContainer {
 
   public final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  private final ArmSubsystem m_robotArm = new ArmSubsystem();
+  public final ArmSubsystem m_robotArm = new ArmSubsystem();
   private final PowerDistribution PDP = new PowerDistribution(0, ModuleType.kCTRE);
 
   Joystick m_driverController = new Joystick(OIConstants.kDriverControllerPort);
@@ -126,16 +126,15 @@ public class RobotContainer {
   }
 
   private void updateSmartdashboard() {
-    SmartDashboard.putNumber("Raw Odometry X Coord", Units.metersToFeet(m_robotDrive.getRawOdometryPose().getX()));
-    SmartDashboard.putNumber("Raw Odometry Y Coord", Units.metersToFeet(m_robotDrive.getRawOdometryPose().getY()));
     SmartDashboard.putNumber("Processing X Coord", Units.metersToFeet(m_robotDrive.getPose().getX()));
     SmartDashboard.putNumber("Processing Y Coord", Units.metersToFeet(m_robotDrive.getPose().getY()));
-    SmartDashboard.putNumber("Estimated X Coord", Units.metersToFeet(m_robotDrive.getEstimatedPose().getX()));
-    SmartDashboard.putNumber("Estimated Y Coord", Units.metersToFeet(m_robotDrive.getEstimatedPose().getY()));
+
+    SmartDashboard.putNumber("Vertical Arm Encoder", m_robotArm.getVertEncoder());
+    SmartDashboard.putNumber("Horizontal Arm Encoder", m_robotArm.getHorizontalEncoder());
+    SmartDashboard.putNumber("Horizontal Arm Encoder", m_robotArm.getRotationalEncoder());
   }
 
-  private void configureBindings() {
-  }
+  private void configureBindings() {}
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -143,9 +142,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-
     m_robotDrive.updateEstimationFromVision();
-
     return new ParallelRaceGroup( // Parallel Race Group runs commands in parallel, when one ends, they all end.
         new RunCommand(() -> updateSmartdashboard()), // This just runs a command that never ends and just updates the dashboard during auto
         AutonUtils.getCommandScript(this, Script.LEAVE_COMMUNITY_AND_CHARGE)); // This gets the autonomous script (usually a sequential command group)

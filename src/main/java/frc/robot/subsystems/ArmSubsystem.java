@@ -229,4 +229,15 @@ public class ArmSubsystem extends SubsystemBase {
         return this.verticalMotor.getEncoder().getPosition();
     }
 
+    public double getHorizontalEncoder() {
+        return this.horizontalMotor.getEncoder().getPosition();
+    }
+
+    public double getRotationalEncoder() {
+        return this.rotationalMotor.getEncoder().getPosition();
+    }
+
+    public boolean atVerticalLimit() {
+        return armAtVericalLimit.get();
+    }
 }
