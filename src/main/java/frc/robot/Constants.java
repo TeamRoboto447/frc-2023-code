@@ -33,7 +33,7 @@ public final class Constants {
 
     private static final boolean False = false;
 
-    public static boolean useVisionBasedOdemetryEstimation = false;
+    public static boolean useVisionBasedOdemetryEstimation = true;
 
     public static final int kFrontRightDriveID = 11;
     public static final int kFrontLeftDriveID = 21;
@@ -99,8 +99,8 @@ public final class Constants {
 
     public static final int upperArmLimit = 0;
 
-    public static final double kPArmVerticalController = 0.2;
-    public static final double kIArmVerticalController = 0;
+    public static final double kPArmVerticalController = .3;
+    public static final double kIArmVerticalController = .2;
     public static final double kPArmHorizontalController = 0.1;
     public static final double kIArmHorizontalController = 0;
     public static final double kPArmRotationalController = 0.1;

@@ -131,7 +131,7 @@ public class RobotContainer {
 
     SmartDashboard.putNumber("Vertical Arm Encoder", m_robotArm.getVertEncoder());
     SmartDashboard.putNumber("Horizontal Arm Encoder", m_robotArm.getHorizontalEncoder());
-    SmartDashboard.putNumber("Horizontal Arm Encoder", m_robotArm.getRotationalEncoder());
+    SmartDashboard.putNumber("Rotational Arm Encoder", m_robotArm.getRotationalEncoder());
   }
 
   private void configureBindings() {}

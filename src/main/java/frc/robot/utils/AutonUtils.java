@@ -14,6 +14,8 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.FollowTrajectory;
 import frc.robot.commands.MoveArmToPosition;
+import frc.robot.commands.SetGrabber;
+import frc.robot.commands.SetGrabberExtension;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class AutonUtils {
@@ -51,13 +53,13 @@ public class AutonUtils {
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(40), Units.feetToMeters(9), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(45), Units.feetToMeters(18), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
             case 2:
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(39), Units.feetToMeters(2), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(36.8), Units.feetToMeters(18), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
             default:
                 return null;
@@ -77,20 +79,20 @@ public class AutonUtils {
                 false); // Create a new movement command for the first movement
 
         startingPose = new Pose2d(
-                Units.feetToMeters(40),
-                Units.feetToMeters(9),
+                Units.feetToMeters(44),
+                Units.feetToMeters(18),
                 startingPose.getRotation()); // Update starting pose for next movement
 
-        // Trajectory traj2 = AutonUtils.getTrajectory(
-        //         Script.LEAVE_COMMUNITY_AND_CHARGE,
-        //         startingPose,
-        //         2); // Get second movement trajectory
+         Trajectory traj2 = AutonUtils.getTrajectory(
+                 Script.LEAVE_COMMUNITY_AND_CHARGE,
+                 startingPose,
+                 2); // Get second movement trajectory
 
-        // FollowTrajectory movement2 = new FollowTrajectory(
-        //         container.m_robotDrive,
-        //         traj2,
-        //         startingPose.getRotation(),
-        //         true); // Create a new movement command for the second movement
+         FollowTrajectory movement2 = new FollowTrajectory(
+                 container.m_robotDrive,
+                 traj2,
+                 startingPose.getRotation(),
+                 true); // Create a new movement command for the second movement
 
         return new SequentialCommandGroup( // This runs the movements in order
                 new InstantCommand(
@@ -99,9 +101,20 @@ public class AutonUtils {
                                         traj1,
                                         container.m_robotDrive))), // Ensure the robot is where it thinks it is if dead
                                                                    // reckoning
-                movement1, // Do First Movement
-                // movement2, // Do Second Movement
-                new MoveArmToPosition(container.m_robotArm, Double.NaN, Double.NaN, Double.NaN), // NaN = don't move
+
+               // new SetGrabberExtension(container.m_robotArm, true),
+               //new MoveArmToPosition(container.m_robotArm, 12,Double.NaN, Double.NaN), // Double.NaN = don't move (vert, horz, rotate)
+               new SetGrabberExtension(container.m_robotArm, true),
+               new MoveArmToPosition(container.m_robotArm,Double.NaN,50, Double.NaN), // Double.NaN = don't move (vert, horz, rotate)
+               new SetGrabber(container.m_robotArm, true),
+                   
+               new SetGrabberExtension(container.m_robotArm, false),
+               new SetGrabber(container.m_robotArm, false),
+               //new MoveArmToPosition(container.m_robotArm, Double.NaN,0, Double.NaN), // NaN = don't move
+               //new MoveArmToPosition(container.m_robotArm, 0, Double.NaN, Double.NaN), // NaN = don't move
+
+             //   movement1, // Do First Movement
+             //   movement2, // Do second Movement
                 new InstantCommand(
                         () -> container.m_robotDrive.stopModules())); // Endure Robot Is Stopped
     }

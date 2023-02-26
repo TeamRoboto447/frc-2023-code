@@ -35,6 +35,6 @@ public class SetGrabber extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return this.delay.get() > 1;
+    return this.delay.get() > 0;
   }
 }
