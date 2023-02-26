@@ -50,13 +50,13 @@ public class AutonUtils {
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(40), Units.feetToMeters(9), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(4), Units.feetToMeters(0), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
             case 2:
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(39), Units.feetToMeters(2), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(34), Units.feetToMeters(-2), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
             default:
                 return null;
@@ -73,11 +73,11 @@ public class AutonUtils {
                 container.m_robotDrive,
                 traj1,
                 startingPose.getRotation(),
-                false); // Create a new movement command for the first movement
+                true); // Create a new movement command for the first movement
 
         startingPose = new Pose2d(
-                Units.feetToMeters(40),
-                Units.feetToMeters(9),
+                Units.feetToMeters(45),
+                Units.feetToMeters(10),
                 startingPose.getRotation()); // Update starting pose for next movement
 
         Trajectory traj2 = AutonUtils.getTrajectory(
@@ -99,7 +99,7 @@ public class AutonUtils {
                                         container.m_robotDrive))), // Ensure the robot is where it thinks it is if dead
                                                                    // reckoning
                 movement1, // Do First Movement
-                movement2, // Do Second Movement
+              //  movement2, // Do Second Movement
                 new InstantCommand(
                         () -> container.m_robotDrive.stopModules())); // Endure Robot Is Stopped
     }
