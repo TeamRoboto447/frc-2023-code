@@ -28,19 +28,15 @@ public class MoveArmToPosition extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    this.armSubsystem.setMaxArmSpeeds(0.5);
+    this.armSubsystem.setMaxArmSpeeds(0.75);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    this.verticalDone = this.armSubsystem.goToVertical(targetHeight);
-    this.horizontalDone = this.armSubsystem.goToHorizontal(targetDist);
-    this.rotationDone = this.armSubsystem.goToRotation(targetRot);
-
-    this.verticalDone = Double.isNaN(targetHeight) ? true : this.armSubsystem.withinMarginV();
-    this.horizontalDone = Double.isNaN(targetDist) ? true : this.armSubsystem.withinMarginH();
-    this.rotationDone = Double.isNaN(targetRot) ? true : this.armSubsystem.withinMarginR();
+    this.verticalDone = Double.isNaN(targetHeight) ? true : this.armSubsystem.goToVertical(targetHeight);
+    this.horizontalDone = Double.isNaN(targetDist) ? true : this.armSubsystem.goToHorizontal(targetDist);
+    this.rotationDone = Double.isNaN(targetRot) ? true : this.armSubsystem.goToRotation(targetRot);
   }
 
   // Called once the command ends or is interrupted.

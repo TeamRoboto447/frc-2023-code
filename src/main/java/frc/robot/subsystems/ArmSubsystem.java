@@ -38,12 +38,21 @@ public class ArmSubsystem extends SubsystemBase {
     private double hMargin = 0.4;
     private double currentRotTarget = 0;
     private double rMargin = 0.4;
+    
     private final PIDController m_armVerticalPositionController = new PIDController(
-            ArmConstants.kPArmVerticalController, ArmConstants.kIArmVerticalController, 0);
+            ArmConstants.kPArmVerticalController,
+            ArmConstants.kIArmVerticalController,
+            ArmConstants.kDArmVerticalController);
+
     private final PIDController m_armHorizontalPositionController = new PIDController(
-            ArmConstants.kPArmHorizontalController, ArmConstants.kIArmHorizontalController, 0);
-    private final PIDController m_armRotationalController = new PIDController(ArmConstants.kPArmRotationalController, 0,
-            0);
+            ArmConstants.kPArmHorizontalController,
+            ArmConstants.kIArmHorizontalController,
+            ArmConstants.kDArmHorizontalController);
+
+    private final PIDController m_armRotationalController = new PIDController(
+            ArmConstants.kPArmRotationalController,
+            ArmConstants.kIArmRotationalController,
+            ArmConstants.kDArmRotationalController);
 
     public ArmSubsystem() {
         this.verticalMotor = new CANSparkMax(ArmConstants.verticalMotor, MotorType.kBrushless);

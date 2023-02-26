@@ -99,11 +99,17 @@ public final class Constants {
 
     public static final int upperArmLimit = 0;
 
-    public static final double kPArmVerticalController = .3;
-    public static final double kIArmVerticalController = .2;
+    public static final double kPArmVerticalController = 0.3;
+    public static final double kIArmVerticalController = 0.2;
+    public static final double kDArmVerticalController = 0;
+
     public static final double kPArmHorizontalController = 0.1;
     public static final double kIArmHorizontalController = 0;
+    public static final double kDArmHorizontalController = 0;
+
     public static final double kPArmRotationalController = 0.1;
+    public static final double kIArmRotationalController = 0;
+    public static final double kDArmRotationalController = 0;
 
     public static final double verticalRange = 43.7;
     public static final double horizontalRange = 63.86;
