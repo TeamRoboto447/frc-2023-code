@@ -5,6 +5,8 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.ArmSubsystem;
 
 public class MoveArmToPosition extends CommandBase {
@@ -34,9 +36,13 @@ public class MoveArmToPosition extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    this.verticalDone = Double.isNaN(targetHeight) ? true : this.armSubsystem.goToVertical(targetHeight);
-    this.horizontalDone = Double.isNaN(targetDist) ? true : this.armSubsystem.goToHorizontal(targetDist);
-    this.rotationDone = Double.isNaN(targetRot) ? true : this.armSubsystem.goToRotation(targetRot);
+    this.armSubsystem.goToVertical(targetHeight);
+    this.armSubsystem.goToHorizontal(targetDist);
+    this.armSubsystem.goToRotation(targetRot);
+
+    this.verticalDone = Double.isNaN(targetHeight) ? true : Math.abs(this.armSubsystem.getVertEncoder() - this.targetHeight) < ArmConstants.verticalPIDTolerance;
+    this.horizontalDone = Double.isNaN(targetDist) ? true : Math.abs(this.armSubsystem.getHorizontalEncoder() - this.targetDist) < ArmConstants.horizontalPIDTolerance;
+    this.rotationDone = Double.isNaN(targetRot) ? true : Math.abs(this.armSubsystem.getRotationalEncoder() - this.targetRot) < ArmConstants.rotationalPIDTolerance;
   }
 
   // Called once the command ends or is interrupted.

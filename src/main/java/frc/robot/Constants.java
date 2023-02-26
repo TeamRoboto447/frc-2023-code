@@ -103,7 +103,7 @@ public final class Constants {
     public static final double kIArmVerticalController = 0.2;
     public static final double kDArmVerticalController = 0;
 
-    public static final double kPArmHorizontalController = 0.1;
+    public static final double kPArmHorizontalController = 0.15;
     public static final double kIArmHorizontalController = 0;
     public static final double kDArmHorizontalController = 0;
 
@@ -116,7 +116,7 @@ public final class Constants {
     public static final double horizontalStart = -9.6;
     public static final double rotationalRange = 3.1; // per direction
 
-    public static final double horizontalPIDTolerance = 0.1;
+    public static final double horizontalPIDTolerance = 0.p;
     public static final double verticalPIDTolerance = 0.1;
     public static final double rotationalPIDTolerance = 0.1;
   }
