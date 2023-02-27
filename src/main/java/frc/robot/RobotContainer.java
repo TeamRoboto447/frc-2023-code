@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.MoveArmToPosition;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.utils.AutonUtils;
 import frc.robot.utils.AutonUtils.Script;
@@ -20,6 +21,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -95,28 +99,10 @@ public class RobotContainer {
 
     m_robotArm.setDefaultCommand(
         new RunCommand(() -> {
-          if (m_operatorController.getXButton()) {
-            m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY() / 4, 0.25));
-            m_robotArm.goToVertical(ArmConstants.verticalRange);
-            m_robotArm.rawIntakeGrabber(deadzone(m_operatorController.getRightX() / 4, 0.25));
-          } else if (m_operatorController.getYButton()) {
-            m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY() / 4, 0.25));
-            m_robotArm.goToVertical(0);
-            m_robotArm.rawIntakeGrabber(deadzone(m_operatorController.getRightX() / 4, 0.25));
-            m_robotArm.open();
-          } else if (m_operatorController.getBButton()) {
-            m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY() / 4, 0.25));
-            m_robotArm.goToVertical(ArmConstants.verticalRange / 4);
-            m_robotArm.rawIntakeGrabber(deadzone(m_operatorController.getRightX() / 4, 0.25));
-          } else if (m_operatorController.getAButton()) {
-            m_robotArm.rawMoveHorizontal(deadzone(m_operatorController.getRightY() / 4, 0.25));
-            m_robotArm.goToVertical(ArmConstants.verticalRange / 2);
-            m_robotArm.rawIntakeGrabber(deadzone(m_operatorController.getRightX() / 4, 0.25));
-          } else {
-            m_robotArm.rawMoveHorizontal(deadzone(-m_operatorController.getRightY() / 4, 0.25));
-            m_robotArm.teleopMoveVertical(deadzone(-m_operatorController.getLeftY() / 4, 0.25));
-            m_robotArm.rawIntakeGrabber(deadzone(m_operatorController.getRightX() / 4, 0.25));
-          }
+          
+          m_robotArm.rawMoveHorizontal(deadzone(-m_operatorController.getRightY() / 4, 0.25));
+          m_robotArm.teleopMoveVertical(deadzone(-m_operatorController.getLeftY() / 4, 0.25));
+          m_robotArm.rawIntakeGrabber(deadzone(m_operatorController.getRightX() / 4, 0.25));
 
           if (m_operatorController.getLeftBumper())
             m_robotArm.extend();
@@ -154,6 +140,37 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+    Trigger aButton = new Trigger(() -> m_operatorController.getAButton());
+    Trigger bButton = new Trigger(() -> m_operatorController.getBButton());
+    Trigger xButton = new Trigger(() -> m_operatorController.getXButton());
+    Trigger yButton = new Trigger(() -> m_operatorController.getYButton());
+
+    aButton.onTrue(
+      new SequentialCommandGroup(
+        
+      )
+    );
+
+    bButton.onTrue(
+      new SequentialCommandGroup(
+        new MoveArmToPosition(m_robotArm, Double.NaN, 30, 0),
+        new MoveArmToPosition(m_robotArm, -10, Double.NaN, 1),
+        new MoveArmToPosition(m_robotArm, 0, Double.NaN, 1),
+        new MoveArmToPosition(m_robotArm, 0, 0, 0)
+      )
+    );
+
+    xButton.onTrue(
+      new SequentialCommandGroup(
+
+      )
+    );
+
+    yButton.onTrue(
+      new SequentialCommandGroup(
+
+      )
+    );
   }
 
   /**
