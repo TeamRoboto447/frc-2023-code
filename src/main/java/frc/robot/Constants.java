@@ -116,7 +116,7 @@ public final class Constants {
     public static final double horizontalStart = -9.6;
     public static final double rotationalRange = 3.1; // per direction
 
-    public static final double horizontalPIDTolerance = 0.p;
+    public static final double horizontalPIDTolerance = 0.1;
     public static final double verticalPIDTolerance = 0.1;
     public static final double rotationalPIDTolerance = 0.1;
   }

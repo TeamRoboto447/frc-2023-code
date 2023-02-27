@@ -61,6 +61,22 @@ public class RobotContainer {
                 0,
                 0,
                 true);
+          } else if (m_driverController.getRawButton(3)) {
+            m_joystickControl.setEnableXYControl(enableXY());
+
+            m_robotDrive.drive(
+                m_joystickControl.getX(),
+                m_joystickControl.getY(),
+                0.1,
+                true);
+          } else if (m_driverController.getRawButton(4)) {
+            m_joystickControl.setEnableXYControl(enableXY());
+
+            m_robotDrive.drive(
+                m_joystickControl.getX(),
+                m_joystickControl.getY(),
+                -0.1,
+                true);
           } else {
 
             m_joystickControl.setEnableXYControl(enableXY());
@@ -134,7 +150,8 @@ public class RobotContainer {
     SmartDashboard.putNumber("Rotational Arm Encoder", m_robotArm.getRotationalEncoder());
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -144,8 +161,10 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     m_robotDrive.updateEstimationFromVision();
     return new ParallelRaceGroup( // Parallel Race Group runs commands in parallel, when one ends, they all end.
-        new RunCommand(() -> updateSmartdashboard()), // This just runs a command that never ends and just updates the dashboard during auto
-        AutonUtils.getCommandScript(this, Script.LEAVE_COMMUNITY_AND_CHARGE)); // This gets the autonomous script (usually a sequential command group)
+        new RunCommand(() -> updateSmartdashboard()), // This just runs a command that never ends and just updates the
+                                                      // dashboard during auto
+        AutonUtils.getCommandScript(this, Script.LEAVE_COMMUNITY_AND_CHARGE)); // This gets the autonomous script
+                                                                               // (usually a sequential command group)
   }
 
   protected double deadzone(double val, double deadzone) {
