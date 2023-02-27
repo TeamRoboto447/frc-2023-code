@@ -31,8 +31,6 @@ public final class Constants {
 
   public static class DriveConstants {
 
-    private static final boolean False = false;
-
     public static boolean useVisionBasedOdemetryEstimation = true;
 
     public static final int kFrontRightDriveID = 11;
@@ -119,7 +117,6 @@ public final class Constants {
     public static final double vertBangBangSpeed = 0.2;
     public static final double horizBangBangSpeed = 0.2;
     public static final double rotBangBangSpeed = 0.2;
-
     public static final double horizontalPIDTolerance = 0.1;
     public static final double verticalPIDTolerance = 0.1;
     public static final double rotationalPIDTolerance = 0.1;

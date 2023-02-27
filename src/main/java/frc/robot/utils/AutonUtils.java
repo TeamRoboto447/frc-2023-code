@@ -53,13 +53,13 @@ public class AutonUtils {
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(45), Units.feetToMeters(18), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(31), Units.feetToMeters(14), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
             case 2:
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(36.8), Units.feetToMeters(18), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(38.8), Units.feetToMeters(18), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
             default:
                 return null;
@@ -79,7 +79,7 @@ public class AutonUtils {
                 false); // Create a new movement command for the first movement
 
         startingPose = new Pose2d(
-                Units.feetToMeters(44),
+                Units.feetToMeters(31),
                 Units.feetToMeters(18),
                 startingPose.getRotation()); // Update starting pose for next movement
 
@@ -105,20 +105,20 @@ public class AutonUtils {
                 // new SetGrabberExtension(container.m_robotArm, true),
                 // new MoveArmToPosition(container.m_robotArm, 12,Double.NaN, Double.NaN), //
                 // Double.NaN = don't move (vert, horz, rotate)
-                new SetGrabberExtension(container.m_robotArm, true),
-                new MoveArmToPosition(container.m_robotArm, Double.NaN, 50, Double.NaN), // Double.NaN = don't move
+                //new SetGrabberExtension(container.m_robotArm, true),
+                //new MoveArmToPosition(container.m_robotArm, Double.NaN, 50, Double.NaN), // Double.NaN = don't move
                                                                                          // (vert, horz, rotate)
-                new SetGrabber(container.m_robotArm, true),
+                //new SetGrabber(container.m_robotArm, true),
 
-                new SetGrabberExtension(container.m_robotArm, false),
-                new SetGrabber(container.m_robotArm, false),
-                // new MoveArmToPosition(container.m_robotArm, Double.NaN,0, Double.NaN), // NaN
+                //new SetGrabberExtension(container.m_robotArm, false),
+                //new SetGrabber(container.m_robotArm, false),
+                //new MoveArmToPosition(container.m_robotArm, Double.NaN,0, Double.NaN), // NaN
                 // = don't move
                 // new MoveArmToPosition(container.m_robotArm, 0, Double.NaN, Double.NaN), //
                 // NaN = don't move
 
-                // movement1, // Do First Movement
-                // movement2, // Do second Movement
+                 movement1, // Do First Movement
+                 movement2, // Do second Movement
                 new InstantCommand(
                         () -> container.m_robotDrive.stopModules())); // Endure Robot Is Stopped
     }
