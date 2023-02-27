@@ -123,14 +123,18 @@ public class RobotContainer {
           else if (m_operatorController.getRightBumper())
             m_robotArm.retract();
 
-          if (m_operatorController.getBackButton())
+          if (axisAsButton(m_operatorController.getLeftTriggerAxis()))
             m_robotArm.open();
-          else if (m_operatorController.getStartButton())
+          else if (axisAsButton(m_operatorController.getRightTriggerAxis()))
             m_robotArm.close();
 
         }, m_robotArm));
 
     PDP.getModule();
+  }
+
+  private boolean axisAsButton(double val) {
+    return Math.abs(val) > 0.5;
   }
 
   private boolean enableROT() {
