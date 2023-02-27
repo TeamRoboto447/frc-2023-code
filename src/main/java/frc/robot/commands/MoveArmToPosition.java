@@ -36,13 +36,31 @@ public class MoveArmToPosition extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    this.armSubsystem.goToVertical(targetHeight);
-    this.armSubsystem.goToHorizontal(targetDist);
-    this.armSubsystem.goToRotation(targetRot);
+    this.verticalDone = Double.isNaN(targetHeight) ? true : this.runVert(targetHeight);
+    this.horizontalDone = Double.isNaN(targetDist) ? true : this.runHoriz(targetDist);
+    this.rotationDone = Double.isNaN(targetRot) ? true : this.runRot(targetRot);
+  }
 
-    this.verticalDone = Double.isNaN(targetHeight) ? true : Math.abs(this.armSubsystem.getVertEncoder() - this.targetHeight) < ArmConstants.verticalPIDTolerance;
-    this.horizontalDone = Double.isNaN(targetDist) ? true : Math.abs(this.armSubsystem.getHorizontalEncoder() - this.targetDist) < ArmConstants.horizontalPIDTolerance;
-    this.rotationDone = Double.isNaN(targetRot) ? true : Math.abs(this.armSubsystem.getRotationalEncoder() - this.targetRot) < ArmConstants.rotationalPIDTolerance;
+  private boolean runVert(double targetHeight) {
+    if(this.armSubsystem.getVertEncoder() < targetHeight) this.armSubsystem.teleopMoveVertical(ArmConstants.vertBangBangSpeed);
+    if(this.armSubsystem.getVertEncoder() > targetHeight) this.armSubsystem.teleopMoveVertical(-ArmConstants.vertBangBangSpeed);
+    return withinMargin(this.armSubsystem.getVertEncoder(), targetHeight, ArmConstants.verticalPIDTolerance);
+  }
+
+  private boolean runHoriz(double targetDist) {
+    if(this.armSubsystem.getHorizontalEncoder() < targetDist) this.armSubsystem.rawMoveHorizontal(ArmConstants.horizBangBangSpeed);
+    if(this.armSubsystem.getHorizontalEncoder() > targetDist) this.armSubsystem.rawMoveHorizontal(-ArmConstants.horizBangBangSpeed);
+    return withinMargin(this.armSubsystem.getHorizontalEncoder(), targetDist, ArmConstants.horizontalPIDTolerance);
+  }
+
+  private boolean runRot(double targetRot) {
+    if(this.armSubsystem.getRotationalEncoder() < targetRot) this.armSubsystem.rawRotateGrabber(ArmConstants.rotBangBangSpeed);
+    if(this.armSubsystem.getRotationalEncoder() > targetRot) this.armSubsystem.rawRotateGrabber(-ArmConstants.rotBangBangSpeed);
+    return withinMargin(this.armSubsystem.getRotationalEncoder(), targetRot, ArmConstants.rotationalPIDTolerance);
+  }
+
+  private boolean withinMargin(double pos, double target, double margin) {
+    return Math.abs(target - pos) <= margin;
   }
 
   // Called once the command ends or is interrupted.
