@@ -13,17 +13,16 @@ public class MoveArmToPosition extends CommandBase {
   private final ArmSubsystem armSubsystem;
   private final double targetHeight;
   private final double targetDist;
-  private final double targetRot;
+  private final double targetIntakeSpeed;
   private boolean verticalDone = false;
   private boolean horizontalDone = false;
-  private boolean rotationDone = false;
   /** Creates a new ExtendAndLift. */
-  public MoveArmToPosition(ArmSubsystem aSubsystem, double tHeight, double tDist, double tRot) {
+  public MoveArmToPosition(ArmSubsystem aSubsystem, double tHeight, double tDist, double tIntakeSpeed) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.armSubsystem = aSubsystem;
     this.targetHeight = tHeight;
     this.targetDist = tDist;
-    this.targetRot = tRot;
+    this.targetIntakeSpeed = tIntakeSpeed;
     addRequirements(aSubsystem);
   }
 
@@ -38,7 +37,7 @@ public class MoveArmToPosition extends CommandBase {
   public void execute() {
     this.verticalDone = Double.isNaN(targetHeight) ? true : this.runVert(targetHeight);
     this.horizontalDone = Double.isNaN(targetDist) ? true : this.runHoriz(targetDist);
-    this.rotationDone = Double.isNaN(targetRot) ? true : this.runRot(targetRot);
+    this.runIntake(targetIntakeSpeed);
   }
 
   private boolean runVert(double targetHeight) {
@@ -53,10 +52,8 @@ public class MoveArmToPosition extends CommandBase {
     return withinMargin(this.armSubsystem.getHorizontalEncoder(), targetDist, ArmConstants.horizontalPIDTolerance);
   }
 
-  private boolean runRot(double targetRot) {
-    if(this.armSubsystem.getRotationalEncoder() < targetRot) this.armSubsystem.rawRotateGrabber(ArmConstants.rotBangBangSpeed);
-    if(this.armSubsystem.getRotationalEncoder() > targetRot) this.armSubsystem.rawRotateGrabber(-ArmConstants.rotBangBangSpeed);
-    return withinMargin(this.armSubsystem.getRotationalEncoder(), targetRot, ArmConstants.rotationalPIDTolerance);
+  private void runIntake(double tRotSpeed) {
+    this.armSubsystem.rawIntakeGrabber(tRotSpeed);
   }
 
   private boolean withinMargin(double pos, double target, double margin) {
@@ -72,6 +69,6 @@ public class MoveArmToPosition extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return this.verticalDone && this.horizontalDone && this.rotationDone;
+    return this.verticalDone && this.horizontalDone;
   }
 }

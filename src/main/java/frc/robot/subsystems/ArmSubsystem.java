@@ -17,7 +17,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     private final CANSparkMax verticalMotor;
     private final CANSparkMax horizontalMotor;
-    private final CANSparkMax rotationalMotor;
+    private final CANSparkMax intakeMotor;
 
     private final DoubleSolenoid extensionRetractionSolenoid;
     private final DoubleSolenoid openCloseSolenoid;
@@ -27,7 +27,7 @@ public class ArmSubsystem extends SubsystemBase {
     private final DigitalInput armAtVericalLimit;
 
     private final double speedScaleFactor = 1.2;
-    private final double rotationalspeedScaleFactor = 0.2;
+    private final double intakespeedScaleFactor = 0.2;
 
     private double lastVertTeleopPos = 0;
 
@@ -36,7 +36,7 @@ public class ArmSubsystem extends SubsystemBase {
     private double vMargin = 0.4;
     private double currentDistTarget = 0;
     private double hMargin = 0.4;
-    private double currentRotTarget = 0;
+    private double currentIntakeTarget = 0;
     private double rMargin = 0.4;
     
     private final PIDController m_armVerticalPositionController = new PIDController(
@@ -49,16 +49,16 @@ public class ArmSubsystem extends SubsystemBase {
             ArmConstants.kIArmHorizontalController,
             ArmConstants.kDArmHorizontalController);
 
-    private final PIDController m_armRotationalController = new PIDController(
-            ArmConstants.kPArmRotationalController,
-            ArmConstants.kIArmRotationalController,
-            ArmConstants.kDArmRotationalController);
+    private final PIDController m_armIntakeController = new PIDController(
+            ArmConstants.kPArmIntakeController,
+            ArmConstants.kIArmIntakeController,
+            ArmConstants.kDArmIntakeController);
 
     public ArmSubsystem() {
         this.verticalMotor = new CANSparkMax(ArmConstants.verticalMotor, MotorType.kBrushless);
         this.verticalMotor.setInverted(true);
         this.horizontalMotor = new CANSparkMax(ArmConstants.horizontalMotor, MotorType.kBrushless);
-        this.rotationalMotor = new CANSparkMax(ArmConstants.rotationalMotor, MotorType.kBrushless);
+        this.intakeMotor = new CANSparkMax(ArmConstants.intakeMotor, MotorType.kBrushless);
 
         this.armAtVericalLimit = new DigitalInput(ArmConstants.upperArmLimit);
 
@@ -72,7 +72,7 @@ public class ArmSubsystem extends SubsystemBase {
 
         this.m_armHorizontalPositionController.setTolerance(ArmConstants.horizontalPIDTolerance);
         this.m_armVerticalPositionController.setTolerance(ArmConstants.verticalPIDTolerance);
-        this.m_armRotationalController.setTolerance(ArmConstants.rotationalPIDTolerance);
+        this.m_armIntakeController.setTolerance(ArmConstants.intakePIDTolerance);
     }
 
     public void moveVertical(double speed) {
@@ -109,24 +109,24 @@ public class ArmSubsystem extends SubsystemBase {
         runHorizontal();
     }
 
-    public boolean goToRotation(double target) {
-        currentRotTarget = Double.isNaN(target) ? currentRotTarget : target;
-        runRotation();
-        return m_armRotationalController.atSetpoint();
+    public boolean goToIntake(double target) {
+        currentIntakeTarget = Double.isNaN(target) ? currentIntakeTarget : target;
+        runIntake();
+        return m_armIntakeController.atSetpoint();
     }
 
-    public void rotateGrabber(double speed) {
-        currentRotTarget += speed * this.rotationalspeedScaleFactor;
-        runRotation();
+    public void intakeGrabber(double speed) {
+        currentIntakeTarget += speed * this.intakespeedScaleFactor;
+        runIntake();
     }
 
-    public void holdRotation() {
-        runRotation();
+    public void holdIntake() {
+        runIntake();
     }
 
     public void holdAll() {
         this.holdHorizontal();
-        this.holdRotation();
+        this.holdIntake();
         this.holdVertical();
     }
 
@@ -141,9 +141,9 @@ public class ArmSubsystem extends SubsystemBase {
         this.rawMoveHorizontal(targetSpeed);
     }
 
-    private void runRotation() {
-        double targetSpeed = clampedRotationalCalculate();
-        this.rawRotateGrabber(targetSpeed);
+    private void runIntake() {
+        double targetSpeed = clampedIntakeCalculate();
+        this.rawIntakeGrabber(targetSpeed);
     }
 
     public void teleopMoveVertical(double speed) {
@@ -166,8 +166,8 @@ public class ArmSubsystem extends SubsystemBase {
         this.horizontalMotor.set(speed);
     }
 
-    public void rawRotateGrabber(double speed) {
-        this.rotationalMotor.set(speed);
+    public void rawIntakeGrabber(double speed) {
+        this.intakeMotor.set(speed);
     }
 
     public boolean withinMarginV() {
@@ -183,8 +183,8 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public boolean withinMarginR() {
-        double set = this.m_armRotationalController.getSetpoint();
-        double at = this.rotationalMotor.getEncoder().getPosition();
+        double set = this.m_armIntakeController.getSetpoint();
+        double at = this.intakeMotor.getEncoder().getPosition();
         return Math.abs(set - at) <= this.rMargin;
     }
 
@@ -211,7 +211,7 @@ public class ArmSubsystem extends SubsystemBase {
     public void stop() {
         this.verticalMotor.stopMotor();
         this.horizontalMotor.stopMotor();
-        this.rotationalMotor.stopMotor();
+        this.intakeMotor.stopMotor();
         this.armBrake.set(false);
     }
 
@@ -225,9 +225,9 @@ public class ArmSubsystem extends SubsystemBase {
                 currentDistTarget), -this.maxPIDOutput, this.maxPIDOutput);
     }
 
-    private double clampedRotationalCalculate() {
-        return MathUtil.clamp(this.m_armRotationalController.calculate(this.rotationalMotor.getEncoder().getPosition(),
-                this.currentRotTarget), -this.maxPIDOutput, this.maxPIDOutput);
+    private double clampedIntakeCalculate() {
+        return MathUtil.clamp(this.m_armIntakeController.calculate(this.intakeMotor.getEncoder().getPosition(),
+                this.currentIntakeTarget), -this.maxPIDOutput, this.maxPIDOutput);
     }
 
     public void setLastVertTeleopPos(double pos) {
@@ -242,8 +242,8 @@ public class ArmSubsystem extends SubsystemBase {
         return this.horizontalMotor.getEncoder().getPosition();
     }
 
-    public double getRotationalEncoder() {
-        return this.rotationalMotor.getEncoder().getPosition();
+    public double getIntakeEncoder() {
+        return this.intakeMotor.getEncoder().getPosition();
     }
 
     public boolean atVerticalLimit() {

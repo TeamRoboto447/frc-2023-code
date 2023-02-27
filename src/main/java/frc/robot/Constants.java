@@ -87,7 +87,7 @@ public final class Constants {
   public static class ArmConstants {
     public static final int verticalMotor = 51;
     public static final int horizontalMotor = 52;
-    public static final int rotationalMotor = 53;
+    public static final int intakeMotor = 53;
 
     public static final int extensionSolenoid = 2;
     public static final int retractionSolenoid = 1;
@@ -105,21 +105,20 @@ public final class Constants {
     public static final double kIArmHorizontalController = 0;
     public static final double kDArmHorizontalController = 0;
 
-    public static final double kPArmRotationalController = 0.1;
-    public static final double kIArmRotationalController = 0;
-    public static final double kDArmRotationalController = 0;
+    public static final double kPArmIntakeController = 0.1;
+    public static final double kIArmIntakeController = 0;
+    public static final double kDArmIntakeController = 0;
 
     public static final double verticalRange = 43.7;
     public static final double horizontalRange = 63.86;
     public static final double horizontalStart = -9.6;
-    public static final double rotationalRange = 3.1; // per direction
 
     public static final double vertBangBangSpeed = 0.2;
     public static final double horizBangBangSpeed = 0.2;
-    public static final double rotBangBangSpeed = 0.2;
+
     public static final double horizontalPIDTolerance = 0.1;
     public static final double verticalPIDTolerance = 0.1;
-    public static final double rotationalPIDTolerance = 0.1;
+    public static final double intakePIDTolerance = 0.1;
   }
 
   public static final class OIConstants {

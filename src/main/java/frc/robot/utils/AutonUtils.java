@@ -104,10 +104,10 @@ public class AutonUtils {
 
                 // new SetGrabberExtension(container.m_robotArm, true),
                 // new MoveArmToPosition(container.m_robotArm, 12,Double.NaN, Double.NaN), //
-                // Double.NaN = don't move (vert, horz, rotate)
+                // Double.NaN = don't move (vert, horz, intake)
                 //new SetGrabberExtension(container.m_robotArm, true),
                 //new MoveArmToPosition(container.m_robotArm, Double.NaN, 50, Double.NaN), // Double.NaN = don't move
-                                                                                         // (vert, horz, rotate)
+                                                                                         // (vert, horz, intake)
                 //new SetGrabber(container.m_robotArm, true),
 
                 //new SetGrabberExtension(container.m_robotArm, false),
