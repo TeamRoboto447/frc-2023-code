@@ -100,16 +100,16 @@ public class RobotContainer {
     m_robotArm.setDefaultCommand(
         new RunCommand(() -> {
           
-          m_robotArm.rawMoveHorizontal(deadzone(-m_operatorController.getRightY() / 4, 0.25));
-          m_robotArm.teleopMoveVertical(deadzone(-m_operatorController.getLeftY() / 4, 0.25));
+          m_robotArm.rawMoveHorizontal(deadzone(-m_operatorController.getRightY() / 1, 0.25));
+          m_robotArm.teleopMoveVertical(deadzone(-m_operatorController.getLeftY() / 1, 0.25));
           m_robotArm.rawIntakeGrabber(deadzone(m_operatorController.getRightX() / 4, 0.25));
 
           if (m_operatorController.getLeftBumper())
             m_robotArm.extend();
-          else if (m_operatorController.getRightBumper())
+          else if (axisAsButton(m_operatorController.getLeftTriggerAxis()))
             m_robotArm.retract();
 
-          if (axisAsButton(m_operatorController.getLeftTriggerAxis()))
+          if (m_operatorController.getRightBumper())
             m_robotArm.open();
           else if (axisAsButton(m_operatorController.getRightTriggerAxis()))
             m_robotArm.close();
@@ -153,10 +153,10 @@ public class RobotContainer {
 
     bButton.onTrue(
       new SequentialCommandGroup(
-        new MoveArmToPosition(m_robotArm, Double.NaN, 30, 0),
-        new MoveArmToPosition(m_robotArm, -10, Double.NaN, 1),
-        new MoveArmToPosition(m_robotArm, 0, Double.NaN, 1),
-        new MoveArmToPosition(m_robotArm, 0, 0, 0)
+        //new MoveArmToPosition(m_robotArm, Double.NaN, 31.9, 0),
+        //new MoveArmToPosition(m_robotArm, -38.45, Double.NaN, 1),
+        //new MoveArmToPosition(m_robotArm, 0, Double.NaN, 1),
+        //new MoveArmToPosition(m_robotArm, 0, 0, 0)
       )
     );
 
