@@ -17,6 +17,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 
@@ -44,6 +46,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   private final AHRS m_gyro = new AHRS();
   private final PhotonCameraWrapper photonWrapper;
+  private final Solenoid floorBrake;
 
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
@@ -68,6 +71,7 @@ public class DriveSubsystem extends SubsystemBase {
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
     photonWrapper = new PhotonCameraWrapper();
+    floorBrake = new Solenoid(PneumaticsModuleType.CTREPCM, DriveConstants.floorBrakeChannel);
     m_gyro.setAngleAdjustment(DriveConstants.angleOffset);
     update(
         new SwerveModulePosition[] {
@@ -181,6 +185,17 @@ public class DriveSubsystem extends SubsystemBase {
 
   public double getTurnRate() {
     return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+  }
+
+  public void hold() {
+    this.setBrakeMode(true);
+    this.drive(0, 0, 0, false);
+    this.floorBrake.set(true);
+  }
+
+  public void allowMovement() {
+    this.setBrakeMode(false);
+    this.floorBrake.set(false);
   }
 
   public void stopModules() {

@@ -110,7 +110,7 @@ public class RobotContainer {
           if(m_operatorController.getRightTriggerAxis() > 0.25)
             m_robotArm.rawIntakeGrabber(m_operatorController.getRightTriggerAxis());
           else if(m_operatorController.getLeftTriggerAxis() > 0.25)
-            m_robotArm.rawIntakeGrabber(m_operatorController.getLeftTriggerAxis());
+            m_robotArm.rawIntakeGrabber(-m_operatorController.getLeftTriggerAxis());
           else
             m_robotArm.rawIntakeGrabber(0);
           
@@ -165,10 +165,10 @@ public class RobotContainer {
         () -> { // Execute
           m_robotArm.stop();
           m_robotDrive.drive(0, 0, 0, false);
-          m_robotDrive.setBrakeMode(true);
+          m_robotDrive.hold();
         },
         inturrupted -> { // On End
-          m_robotDrive.setBrakeMode(false);
+          m_robotDrive.allowMovement();
         },
         () -> m_driverController.getRawButton(7), // Whether to end or not
         m_robotDrive,

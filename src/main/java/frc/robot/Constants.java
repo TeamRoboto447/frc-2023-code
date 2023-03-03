@@ -31,7 +31,9 @@ public final class Constants {
 
   public static class DriveConstants {
 
-    public static boolean useVisionBasedOdemetryEstimation = true;
+    public static final boolean useVisionBasedOdemetryEstimation = true;
+
+    public static final int floorBrakeChannel = 5;
 
     public static final int kFrontRightDriveID = 11;
     public static final int kFrontLeftDriveID = 21;
