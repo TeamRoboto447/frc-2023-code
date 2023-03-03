@@ -111,6 +111,8 @@ public class RobotContainer {
             m_robotArm.rawIntakeGrabber(m_operatorController.getRightTriggerAxis());
           else if(m_operatorController.getLeftTriggerAxis() > 0.25)
             m_robotArm.rawIntakeGrabber(m_operatorController.getLeftTriggerAxis());
+          else
+            m_robotArm.rawIntakeGrabber(0);
           
           leftBumperToggle.runToggle(m_operatorController.getLeftBumper());
           if (leftBumperToggle.getState())
@@ -119,7 +121,7 @@ public class RobotContainer {
             m_robotArm.retract();
 
           rightBumperToggle.runToggle(m_operatorController.getRightBumper());
-          if (m_operatorController.getRightBumper())
+          if (rightBumperToggle.getState())
             m_robotArm.open();
           else
             m_robotArm.close();
