@@ -53,13 +53,13 @@ public class AutonUtils {
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(31), Units.feetToMeters(14), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(26), Units.feetToMeters(2), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
             case 2:
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(38.8), Units.feetToMeters(18), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(33.5), Units.feetToMeters(9.5), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
             default:
                 return null;
@@ -67,7 +67,7 @@ public class AutonUtils {
     }
 
     public static Command getCommandScript(RobotContainer container, Script script) {
-        Pose2d startingPose = container.m_robotDrive.getEstimatedPose(); // Setup starting pose
+        Pose2d startingPose = container.m_robotDrive.getPose(); // Setup starting pose
         Trajectory traj1 = AutonUtils.getTrajectory(
                 Script.LEAVE_COMMUNITY_AND_CHARGE,
                 startingPose,
@@ -79,8 +79,8 @@ public class AutonUtils {
                 false); // Create a new movement command for the first movement
 
         startingPose = new Pose2d(
-                Units.feetToMeters(31),
-                Units.feetToMeters(18),
+                Units.feetToMeters(26),
+                Units.feetToMeters(9.5),
                 startingPose.getRotation()); // Update starting pose for next movement
 
         Trajectory traj2 = AutonUtils.getTrajectory(

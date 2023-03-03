@@ -100,9 +100,9 @@ public class RobotContainer {
     m_robotArm.setDefaultCommand(
         new RunCommand(() -> {
           
-          m_robotArm.rawMoveHorizontal(deadzone(-m_operatorController.getRightY() / 1, 0.25));
+          m_robotArm.rawMoveHorizontal(deadzone(-m_operatorController.getRightX() / 1, 0.25));
           m_robotArm.teleopMoveVertical(deadzone(-m_operatorController.getLeftY() / 1, 0.25));
-          m_robotArm.rawIntakeGrabber(deadzone(m_operatorController.getRightX() / 4, 0.25));
+          m_robotArm.rawIntakeGrabber(deadzone(m_operatorController.getRightY() / 4, 0.25));
 
           if (m_operatorController.getLeftBumper())
             m_robotArm.extend();
