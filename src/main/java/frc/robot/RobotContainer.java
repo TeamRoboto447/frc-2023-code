@@ -9,6 +9,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.commands.MoveArmToPosition;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.utils.AutonUtils;
+import frc.robot.utils.Toggle;
 import frc.robot.utils.AutonUtils.Script;
 import frc.robot.subsystems.ArmSubsystem;
 
@@ -19,10 +20,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -42,7 +43,10 @@ public class RobotContainer {
 
   Joystick m_driverController = new Joystick(OIConstants.kDriverControllerPort);
   JoystickControl m_joystickControl = new JoystickControl(m_driverController, 0.25, 0.25, -10, -0.333);
+
   XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
+  Toggle leftBumperToggle = new Toggle(false);
+  Toggle rightBumperToggle = new Toggle(false);
 
   public RobotContainer() {
     // Configure the trigger bindings
@@ -102,16 +106,22 @@ public class RobotContainer {
           
           m_robotArm.rawMoveHorizontal(deadzone(-m_operatorController.getRightX() / 1, 0.25));
           m_robotArm.teleopMoveVertical(deadzone(-m_operatorController.getLeftY() / 1, 0.25));
-          m_robotArm.rawIntakeGrabber(deadzone(m_operatorController.getRightY() / 4, 0.25));
 
-          if (m_operatorController.getLeftBumper())
+          if(m_operatorController.getRightTriggerAxis() > 0.25)
+            m_robotArm.rawIntakeGrabber(m_operatorController.getRightTriggerAxis());
+          else if(m_operatorController.getLeftTriggerAxis() > 0.25)
+            m_robotArm.rawIntakeGrabber(m_operatorController.getLeftTriggerAxis());
+          
+          leftBumperToggle.runToggle(m_operatorController.getLeftBumper());
+          if (leftBumperToggle.getState())
             m_robotArm.extend();
-          else if (axisAsButton(m_operatorController.getLeftTriggerAxis()))
+          else
             m_robotArm.retract();
 
+          rightBumperToggle.runToggle(m_operatorController.getRightBumper());
           if (m_operatorController.getRightBumper())
             m_robotArm.open();
-          else if (axisAsButton(m_operatorController.getRightTriggerAxis()))
+          else
             m_robotArm.close();
 
         }, m_robotArm));
@@ -119,9 +129,9 @@ public class RobotContainer {
     PDP.getModule();
   }
 
-  private boolean axisAsButton(double val) {
-    return Math.abs(val) > 0.5;
-  }
+  // private boolean axisAsButton(double val) {
+  //   return Math.abs(val) > 0.5;
+  // }
 
   private boolean enableROT() {
     return m_driverController.getRawButton(1);
@@ -145,10 +155,29 @@ public class RobotContainer {
     Trigger xButton = new Trigger(() -> m_operatorController.getXButton());
     Trigger yButton = new Trigger(() -> m_operatorController.getYButton());
 
+    Trigger freezeRobot = new Trigger(() -> m_driverController.getRawButton(8));
+
+    freezeRobot.onTrue(
+      new FunctionalCommand(
+        () -> {}, // Init, don't do anything
+        () -> { // Execute
+          m_robotArm.stop();
+          m_robotDrive.drive(0, 0, 0, false);
+          m_robotDrive.setBrakeMode(true);
+        },
+        inturrupted -> { // On End
+          m_robotDrive.setBrakeMode(false);
+        },
+        () -> m_driverController.getRawButton(7), // Whether to end or not
+        m_robotDrive,
+        m_robotArm)
+    );
+
     aButton.onTrue(
-      new SequentialCommandGroup(
+      new RunCommand(() -> {})
+      // new SequentialCommandGroup(
         
-      )
+      // )
     );
 
     bButton.onTrue(
