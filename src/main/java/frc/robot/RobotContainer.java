@@ -147,6 +147,8 @@ public class RobotContainer {
     SmartDashboard.putNumber("Processing X Coord", Units.metersToFeet(m_robotDrive.getPose().getX()));
     SmartDashboard.putNumber("Processing Y Coord", Units.metersToFeet(m_robotDrive.getPose().getY()));
 
+    SmartDashboard.putNumber("Gyro Angle", m_robotDrive.getHeading());
+    
     SmartDashboard.putNumber("Vertical Arm Encoder", m_robotArm.getVertEncoder());
     SmartDashboard.putNumber("Horizontal Arm Encoder", m_robotArm.getHorizontalEncoder());
   }
