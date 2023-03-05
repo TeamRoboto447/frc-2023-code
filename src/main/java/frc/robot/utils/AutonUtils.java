@@ -16,6 +16,7 @@ import frc.robot.commands.FollowTrajectory;
 import frc.robot.commands.MoveArmToPosition;
 import frc.robot.commands.SetGrabber;
 import frc.robot.commands.SetGrabberExtension;
+import frc.robot.commands.SetGrabberExtensionWithIntake;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class AutonUtils {
@@ -106,8 +107,8 @@ public class AutonUtils {
                 // new MoveArmToPosition(container.m_robotArm, 12,Double.NaN, Double.NaN), //
                 // Double.NaN = don't move (vert, horz, intake)
                 new SetGrabberExtension(container.m_robotArm, true),
-                new MoveArmToPosition(container.m_robotArm, Double.NaN, Double.NaN, -1), // Double.NaN = don't move
-                                                                                         // (vert, horz, intake)
+                new SetGrabberExtensionWithIntake(container.m_robotArm, true, 1),
+                new SetGrabberExtension(container.m_robotArm, true),
                 //new SetGrabber(container.m_robotArm, true),
 
                 //new SetGrabberExtension(container.m_robotArm, false),

@@ -39,6 +39,6 @@ public class SetGrabberExtensionWithIntake extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return this.delay.get() > 0;
+    return this.delay.get() > 1;
   }
 }
