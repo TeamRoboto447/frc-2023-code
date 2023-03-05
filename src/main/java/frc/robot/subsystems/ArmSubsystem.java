@@ -39,6 +39,9 @@ public class ArmSubsystem extends SubsystemBase {
     private double currentIntakeTarget = 0;
     private double rMargin = 0.4;
     
+    private Value grabberState = Value.kReverse;
+    private Value extensionState = Value.kReverse;
+
     private final PIDController m_armVerticalPositionController = new PIDController(
             ArmConstants.kPArmVerticalController,
             ArmConstants.kIArmVerticalController,
@@ -73,6 +76,12 @@ public class ArmSubsystem extends SubsystemBase {
         this.m_armHorizontalPositionController.setTolerance(ArmConstants.horizontalPIDTolerance);
         this.m_armVerticalPositionController.setTolerance(ArmConstants.verticalPIDTolerance);
         this.m_armIntakeController.setTolerance(ArmConstants.intakePIDTolerance);
+    }
+
+    @Override
+    public void periodic() {
+        this.openCloseSolenoid.set(this.grabberState);
+        this.extensionRetractionSolenoid.set(this.extensionState);
     }
 
     public void moveVertical(double speed) {
@@ -189,19 +198,19 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public void extend() {
-        this.extensionRetractionSolenoid.set(Value.kForward);
+        this.extensionState = Value.kForward;
     }
 
     public void retract() {
-        this.extensionRetractionSolenoid.set(Value.kReverse);
+        this.extensionState = Value.kReverse;
     }
 
     public void open() {
-        this.openCloseSolenoid.set(Value.kForward);
+        this.grabberState = Value.kForward;
     }
 
     public void close() {
-        this.openCloseSolenoid.set(Value.kReverse);
+        this.grabberState = Value.kReverse;
     }
 
     public void setMaxArmSpeeds(double maxSpeed) {

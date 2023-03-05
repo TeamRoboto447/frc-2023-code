@@ -38,6 +38,11 @@ public class SetGrabberWithIntake extends CommandBase {
   }
 
   @Override
+  public void end(boolean interrupted) {
+    this.armSubsystem.stop();
+  }
+
+  @Override
   public boolean isFinished() {
     return this.delay.get() > 0;
   }
