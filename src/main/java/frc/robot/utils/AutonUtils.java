@@ -53,13 +53,13 @@ public class AutonUtils {
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(26), Units.feetToMeters(2), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(14.11), Units.feetToMeters(9), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
             case 2:
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(33.5), Units.feetToMeters(9.5), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(15), Units.feetToMeters(9), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
             default:
                 return null;
@@ -76,11 +76,11 @@ public class AutonUtils {
                 container.m_robotDrive,
                 traj1,
                 startingPose.getRotation(),
-                false); // Create a new movement command for the first movement
+                true); // Create a new movement command for the first movement
 
         startingPose = new Pose2d(
-                Units.feetToMeters(26),
-                Units.feetToMeters(9.5),
+                Units.feetToMeters(20),
+                Units.feetToMeters(9),
                 startingPose.getRotation()); // Update starting pose for next movement
 
         Trajectory traj2 = AutonUtils.getTrajectory(
@@ -105,8 +105,8 @@ public class AutonUtils {
                 // new SetGrabberExtension(container.m_robotArm, true),
                 // new MoveArmToPosition(container.m_robotArm, 12,Double.NaN, Double.NaN), //
                 // Double.NaN = don't move (vert, horz, intake)
-                //new SetGrabberExtension(container.m_robotArm, true),
-                //new MoveArmToPosition(container.m_robotArm, Double.NaN, 50, Double.NaN), // Double.NaN = don't move
+                new SetGrabberExtension(container.m_robotArm, true),
+                new MoveArmToPosition(container.m_robotArm, Double.NaN, Double.NaN, -1), // Double.NaN = don't move
                                                                                          // (vert, horz, intake)
                 //new SetGrabber(container.m_robotArm, true),
 
@@ -117,10 +117,10 @@ public class AutonUtils {
                 // new MoveArmToPosition(container.m_robotArm, 0, Double.NaN, Double.NaN), //
                 // NaN = don't move
 
-                 movement1, // Do First Movement
-                 movement2, // Do second Movement
+                // movement1, // Do First Movement
+                // movement2, // Do second Movement
                 new InstantCommand(
-                        () -> container.m_robotDrive.stopModules())); // Endure Robot Is Stopped
+                        () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped
     }
 
     public static enum Script {

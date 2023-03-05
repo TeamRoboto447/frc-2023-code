@@ -45,6 +45,8 @@ public class RobotContainer {
   JoystickControl m_joystickControl = new JoystickControl(m_driverController, 0.25, 0.25, -10, -0.333);
 
   XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
+  POVToAxis m_operatorPOVAxis = new POVToAxis(m_operatorController, -0.75, 0.75, -0.75, 0.75); // controller, xMin, xMax, yMin, yMax
+
   Toggle leftBumperToggle = new Toggle(false);
   Toggle rightBumperToggle = new Toggle(false);
 
@@ -57,15 +59,15 @@ public class RobotContainer {
           m_robotDrive.setBrakeMode(false);
 
           if (m_driverController.getRawButton(5)) {
-            m_robotDrive.drive(
-                2.5,
+           m_robotDrive.drive(
+                -2.5,
                 0,
                 0,
                 true);
 
           } else if (m_driverController.getRawButton(6)) {
             m_robotDrive.drive(
-                -2.5,
+                2.5,
                 0,
                 0,
                 true);
@@ -104,8 +106,11 @@ public class RobotContainer {
     m_robotArm.setDefaultCommand(
         new RunCommand(() -> {
           
-          m_robotArm.rawMoveHorizontal(deadzone(-m_operatorController.getRightX() / 1, 0.25));
-          m_robotArm.teleopMoveVertical(deadzone(-m_operatorController.getLeftY() / 1, 0.25));
+          // m_robotArm.rawMoveHorizontal(deadzone(-m_operatorController.getRightX() / 1, 0.25));
+          // m_robotArm.teleopMoveVertical(deadzone(-m_operatorController.getLeftY() / 1, 0.25));
+
+          m_robotArm.rawMoveHorizontal(m_operatorPOVAxis.getY());
+          m_robotArm.teleopMoveVertical(m_operatorPOVAxis.getX());
 
           if(m_operatorController.getRightTriggerAxis() > 0.25)
             m_robotArm.rawIntakeGrabber(m_operatorController.getRightTriggerAxis());
@@ -227,6 +232,36 @@ public class RobotContainer {
       return val;
   }
 
+  private class POVToAxis {
+    private final XboxController joystick;
+    private final double xMin;
+    private final double xMax;
+    private final double yMin;
+    private final double yMax;
+
+    public POVToAxis(XboxController joystick, double xMin, double xMax, double yMin, double yMax) {
+      this.joystick = joystick;
+      this.xMin = xMin;
+      this.xMax = xMax;
+      this.yMin = yMin;
+      this.yMax = yMax;
+    }
+
+    public double getX() {
+      double pov = this.joystick.getPOV();
+      if(pov == 315 || pov == 0 || pov == 45) return this.yMax;
+      if(pov == 135 || pov == 180 || pov == 225) return this.yMin;
+      return 0;
+    }
+
+    public double getY() {
+      double pov = this.joystick.getPOV();
+      if(pov == 45 || pov == 90 || pov == 135)return this.xMin;
+      if(pov == 225 || pov == 270 || pov == 315) return this.xMax;
+      return 0;
+    }
+  }
+
   private class JoystickControl {
     private final Joystick joystick;
     private final double deadzoneXY;
@@ -254,7 +289,7 @@ public class RobotContainer {
     }
 
     public double getROT() {
-      return this.enableROT ? -(deadzone(this.joystick.getZ(), this.deadzoneROT) * this.multiplierROT) : 0;
+      return this.enableROT ? (deadzone(this.joystick.getZ(), this.deadzoneROT) * this.multiplierROT) : 0;
     }
 
     public void setEnableXYControl(boolean enabled) {
