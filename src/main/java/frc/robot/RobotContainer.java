@@ -191,8 +191,8 @@ public class RobotContainer {
 
     bButton.onTrue(
       new SequentialCommandGroup(
-        //new MoveArmToPosition(m_robotArm, Double.NaN, 31.9, 0),
-        //new MoveArmToPosition(m_robotArm, -38.45, Double.NaN, 1),
+        new MoveArmToPosition(m_robotArm, Double.NaN, 136, Double.NaN),
+        new MoveArmToPosition(m_robotArm, -170, Double.NaN, Double.NaN)
         //new MoveArmToPosition(m_robotArm, 0, Double.NaN, 1),
         //new MoveArmToPosition(m_robotArm, 0, 0, 0)
       )

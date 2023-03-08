@@ -54,13 +54,13 @@ public class AutonUtils {
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(14.11), Units.feetToMeters(9), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(19), Units.feetToMeters(10), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
             case 2:
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(15), Units.feetToMeters(9), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(14.5), Units.feetToMeters(9), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
             default:
                 return null;
@@ -77,11 +77,11 @@ public class AutonUtils {
                 container.m_robotDrive,
                 traj1,
                 startingPose.getRotation(),
-                true); // Create a new movement command for the first movement
+                false); // Create a new movement command for the first movement
 
         startingPose = new Pose2d(
-                Units.feetToMeters(20),
-                Units.feetToMeters(9),
+                Units.feetToMeters(19),
+                Units.feetToMeters(10),
                 startingPose.getRotation()); // Update starting pose for next movement
 
         Trajectory traj2 = AutonUtils.getTrajectory(
@@ -103,14 +103,10 @@ public class AutonUtils {
                                         container.m_robotDrive))), // Ensure the robot is where it thinks it is if dead
                                                                    // reckoning
 
-                // new SetGrabberExtension(container.m_robotArm, true),
-                // new MoveArmToPosition(container.m_robotArm, 12,Double.NaN, Double.NaN), //
-                // Double.NaN = don't move (vert, horz, intake)
                 new SetGrabberExtension(container.m_robotArm, true),
                 new SetGrabberExtensionWithIntake(container.m_robotArm, true, 1),
                 new SetGrabberExtension(container.m_robotArm, true),
-                //new SetGrabber(container.m_robotArm, true),
-
+ 
                 //new SetGrabberExtension(container.m_robotArm, false),
                 //new SetGrabber(container.m_robotArm, false),
                 //new MoveArmToPosition(container.m_robotArm, Double.NaN,0, Double.NaN), // NaN
