@@ -37,17 +37,19 @@ public class MoveArmToLimit extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (this.verticalLimit == Limit.NO_CHANGE)
+    if (this.verticalLimit == Limit.NO_CHANGE) {
       this.verticalDone = true;
       stopVert();
+    }
     else if (this.verticalLimit == Limit.TOP_VERTICAL)
       this.verticalDone = runVert(ArmConstants.vertBangBangSpeed);
     else if (this.verticalLimit == Limit.BOTTOM_VERTICAL)
     this.verticalDone = runVert(-ArmConstants.vertBangBangSpeed);
 
-    if (this.horizontalLimit == Limit.NO_CHANGE)
+    if (this.horizontalLimit == Limit.NO_CHANGE) {
       this.horizontalDone = true;
       stopHoriz();
+    }
     else if (this.horizontalLimit == Limit.FAR_HORIZONTAL)
       this.horizontalDone = runHoriz(ArmConstants.horizBangBangSpeed);
     else if(this.horizontalLimit == Limit.CLOSE_HORIZONTAL)
@@ -57,7 +59,7 @@ public class MoveArmToLimit extends CommandBase {
   }
 
   private boolean runVert(double speed) {
-    this.armSubsystem.rawMoveHorizontal(speed);
+    this.armSubsystem.rawMoveVertical(speed);
     return speed > 0 ? this.armSubsystem.atVerticalHighLimit() : this.armSubsystem.atVerticalLowLimit();
   }
 
