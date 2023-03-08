@@ -208,7 +208,7 @@ public class RobotContainer {
     bButton.onTrue(
         new ParallelRaceGroup(
             new SequentialCommandGroup(
-                new MoveArmToPosition(m_robotArm, Double.NaN, 136, Double.NaN),
+                new MoveArmToPosition(m_robotArm, Double.NaN, 56, 0),
                 new SetGrabber(m_robotArm, true),
                 new MoveArmToLimit(m_robotArm, Limit.BOTTOM_VERTICAL, Limit.NO_CHANGE, 0)),
             new WaitForInput(this::shouldAbortCommand)));

@@ -12,6 +12,7 @@ public class WaitForInput extends CommandBase {
   Supplier<Boolean> stopSupplier;
   /** Creates a new WaitForInput. */
   public WaitForInput(Supplier<Boolean> readyToStop) {
+    this.stopSupplier = readyToStop;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
