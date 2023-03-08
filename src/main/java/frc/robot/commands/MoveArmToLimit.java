@@ -39,6 +39,7 @@ public class MoveArmToLimit extends CommandBase {
   public void execute() {
     if (this.verticalLimit == Limit.NO_CHANGE)
       this.verticalDone = true;
+      stopVert();
     else if (this.verticalLimit == Limit.TOP_VERTICAL)
       this.verticalDone = runVert(ArmConstants.vertBangBangSpeed);
     else if (this.verticalLimit == Limit.BOTTOM_VERTICAL)
@@ -46,6 +47,7 @@ public class MoveArmToLimit extends CommandBase {
 
     if (this.horizontalLimit == Limit.NO_CHANGE)
       this.horizontalDone = true;
+      stopHoriz();
     else if (this.horizontalLimit == Limit.FAR_HORIZONTAL)
       this.horizontalDone = runHoriz(ArmConstants.horizBangBangSpeed);
     else if(this.horizontalLimit == Limit.CLOSE_HORIZONTAL)
@@ -62,6 +64,16 @@ public class MoveArmToLimit extends CommandBase {
   private boolean runHoriz(double speed) {
     this.armSubsystem.rawMoveHorizontal(speed);
     return speed > 0 ? this.armSubsystem.atHorizontalHighLimit() : this.armSubsystem.atHorizontalLowLimit();
+  }
+
+  private void stopVert() {
+    this.armSubsystem.goToVertical(this.armSubsystem.getVertEncoder());
+    this.armSubsystem.rawMoveVertical(0);
+  }
+
+  private void stopHoriz() {
+    this.armSubsystem.goToHorizontal(this.armSubsystem.getHorizontalEncoder());
+    this.armSubsystem.rawMoveHorizontal(0);
   }
 
   private void runIntake(double tRotSpeed) {
