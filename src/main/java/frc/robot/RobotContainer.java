@@ -52,7 +52,8 @@ public class RobotContainer {
   JoystickControl m_joystickControl = new JoystickControl(m_driverController, 0.25, 0.25, -10, -0.333);
 
   XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
-  POVToAxis m_operatorPOVAxis = new POVToAxis(m_operatorController, -0.75, 0.75, -0.75, 0.75); // controller, xMin, xMax, yMin, yMax
+  POVToAxis m_operatorPOVAxis = new POVToAxis(m_operatorController, -0.75, 0.75, -0.75, 0.75); // controller, xMin,
+                                                                                               // xMax, yMin, yMax
 
   Toggle leftBumperToggle = new Toggle(false);
   Toggle rightBumperToggle = new Toggle(false);
@@ -66,7 +67,7 @@ public class RobotContainer {
           m_robotDrive.setBrakeMode(false);
 
           if (m_driverController.getRawButton(5)) {
-           m_robotDrive.drive(
+            m_robotDrive.drive(
                 -2.5,
                 0,
                 0,
@@ -112,20 +113,22 @@ public class RobotContainer {
 
     m_robotArm.setDefaultCommand(
         new RunCommand(() -> {
-          
-          // m_robotArm.rawMoveHorizontal(deadzone(-m_operatorController.getRightX() / 1, 0.25));
-          // m_robotArm.teleopMoveVertical(deadzone(-m_operatorController.getLeftY() / 1, 0.25));
+
+          // m_robotArm.rawMoveHorizontal(deadzone(-m_operatorController.getRightX() / 1,
+          // 0.25));
+          // m_robotArm.teleopMoveVertical(deadzone(-m_operatorController.getLeftY() / 1,
+          // 0.25));
 
           m_robotArm.rawMoveHorizontal(m_operatorPOVAxis.getY());
           m_robotArm.teleopMoveVertical(m_operatorPOVAxis.getX());
 
-          if(m_operatorController.getRightTriggerAxis() > 0.25)
+          if (m_operatorController.getRightTriggerAxis() > 0.25)
             m_robotArm.rawIntakeGrabber(m_operatorController.getRightTriggerAxis());
-          else if(m_operatorController.getLeftTriggerAxis() > 0.25)
+          else if (m_operatorController.getLeftTriggerAxis() > 0.25)
             m_robotArm.rawIntakeGrabber(-m_operatorController.getLeftTriggerAxis());
           else
             m_robotArm.rawIntakeGrabber(0);
-          
+
           leftBumperToggle.runToggle(m_operatorController.getLeftBumper());
           if (leftBumperToggle.getState())
             m_robotArm.extend();
@@ -144,7 +147,7 @@ public class RobotContainer {
   }
 
   // private boolean axisAsButton(double val) {
-  //   return Math.abs(val) > 0.5;
+  // return Math.abs(val) > 0.5;
   // }
 
   private boolean enableROT() {
@@ -160,9 +163,13 @@ public class RobotContainer {
     SmartDashboard.putNumber("Processing Y Coord", Units.metersToFeet(m_robotDrive.getPose().getY()));
 
     SmartDashboard.putNumber("Gyro Angle", m_robotDrive.getHeading());
-    
+
     SmartDashboard.putNumber("Vertical Arm Encoder", m_robotArm.getVertEncoder());
     SmartDashboard.putNumber("Horizontal Arm Encoder", m_robotArm.getHorizontalEncoder());
+  }
+
+  private boolean shouldAbortCommand() {
+    return m_operatorController.getBackButton();
   }
 
   private void configureBindings() {
@@ -174,57 +181,54 @@ public class RobotContainer {
     Trigger freezeRobot = new Trigger(() -> m_driverController.getRawButton(8));
 
     freezeRobot.onTrue(
-      new FunctionalCommand(
-        () -> {}, // Init, don't do anything
-        () -> { // Execute
-          m_robotArm.stop();
-          m_robotDrive.drive(0, 0, 0, false);
-          m_robotDrive.hold();
-        },
-        inturrupted -> { // On End
-          m_robotDrive.allowMovement();
-        },
-        () -> m_driverController.getRawButton(7), // Whether to end or not
-        m_robotDrive,
-        m_robotArm)
-    );
+        new FunctionalCommand(
+            () -> {
+            }, // Init, don't do anything
+            () -> { // Execute
+              m_robotArm.stop();
+              m_robotDrive.drive(0, 0, 0, false);
+              m_robotDrive.hold();
+            },
+            inturrupted -> { // On End
+              m_robotDrive.allowMovement();
+            },
+            () -> m_driverController.getRawButton(7), // Whether to end or not
+            m_robotDrive,
+            m_robotArm));
 
     aButton.onTrue(
-      new SequentialCommandGroup(
-        new ParallelCommandGroup(
-          new SetGrabberWithIntake(m_robotArm, false, -1),
-          new MoveArmToPosition(m_robotArm, Double.NaN, Double.NaN, -0.2),
-          new MoveArmToPosition(m_robotArm, 10, Double.NaN, 0),
-          new MoveArmToPosition(m_robotArm, Double.NaN, 0, 0)
-        )
-      )
-    );
+        new ParallelRaceGroup(
+            new SequentialCommandGroup(
+                new SetGrabberWithIntake(m_robotArm, false, -1),
+                new MoveArmToPosition(m_robotArm, Double.NaN, Double.NaN, -0.2),
+                new MoveArmToPosition(m_robotArm, 10, Double.NaN, 0),
+                new MoveArmToPosition(m_robotArm, Double.NaN, 0, 0)),
+            new WaitForInput(this::shouldAbortCommand)));
 
     bButton.onTrue(
-      new SequentialCommandGroup(
-        new MoveArmToPosition(m_robotArm, Double.NaN, 136, Double.NaN),
-        new SetGrabber(m_robotArm, true),
-        new MoveArmToLimit(m_robotArm, Limit.BOTTOM_VERTICAL, Limit.NO_CHANGE, 0)
-      )
-    );
+        new ParallelRaceGroup(
+            new SequentialCommandGroup(
+                new MoveArmToPosition(m_robotArm, Double.NaN, 136, Double.NaN),
+                new SetGrabber(m_robotArm, true),
+                new MoveArmToLimit(m_robotArm, Limit.BOTTOM_VERTICAL, Limit.NO_CHANGE, 0)),
+            new WaitForInput(this::shouldAbortCommand)));
 
     xButton.onTrue(
-      new SequentialCommandGroup(
-        new SetGrabberExtension(m_robotArm, true),
-        new MoveArmToLimit(m_robotArm, Limit.TOP_VERTICAL, Limit.NO_CHANGE, 0),
-        new WaitForInput(() -> m_operatorController.getRightBumper()),
-        new MoveArmToPosition(m_robotArm, 0, 0, 0)
-      )
-    );
+        new ParallelRaceGroup(
+            new SequentialCommandGroup(
+                new SetGrabberExtension(m_robotArm, true),
+                new MoveArmToLimit(m_robotArm, Limit.TOP_VERTICAL, Limit.NO_CHANGE, 0),
+                new WaitForInput(() -> m_operatorController.getRightBumper()),
+                new MoveArmToPosition(m_robotArm, 0, 0, 0)),
+            new WaitForInput(this::shouldAbortCommand)));
 
     yButton.onTrue(
-      new SequentialCommandGroup(
-        new SetGrabberExtension(m_robotArm, true),
-        new MoveArmToLimit(m_robotArm, Limit.TOP_VERTICAL, Limit.FAR_HORIZONTAL, 0),
-        new WaitForInput(() -> m_operatorController.getRightBumper()),
-        new MoveArmToPosition(m_robotArm, 0, 0, 0)
-      )
-    );
+        new ParallelRaceGroup(new SequentialCommandGroup(
+            new SetGrabberExtension(m_robotArm, true),
+            // new MoveArmToLimit(m_robotArm, Limit.TOP_VERTICAL, Limit.FAR_HORIZONTAL, 0),
+            new WaitForInput(() -> m_operatorController.getRightBumper()),
+            new MoveArmToPosition(m_robotArm, 0, 0, 0)),
+            new WaitForInput(this::shouldAbortCommand)));
   }
 
   /**
@@ -265,15 +269,19 @@ public class RobotContainer {
 
     public double getX() {
       double pov = this.joystick.getPOV();
-      if(pov == 315 || pov == 0 || pov == 45) return this.yMax;
-      if(pov == 135 || pov == 180 || pov == 225) return this.yMin;
+      if (pov == 315 || pov == 0 || pov == 45)
+        return this.yMax;
+      if (pov == 135 || pov == 180 || pov == 225)
+        return this.yMin;
       return 0;
     }
 
     public double getY() {
       double pov = this.joystick.getPOV();
-      if(pov == 45 || pov == 90 || pov == 135)return this.xMin;
-      if(pov == 225 || pov == 270 || pov == 315) return this.xMax;
+      if (pov == 45 || pov == 90 || pov == 135)
+        return this.xMin;
+      if (pov == 225 || pov == 270 || pov == 315)
+        return this.xMax;
       return 0;
     }
   }
