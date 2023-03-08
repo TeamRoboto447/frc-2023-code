@@ -6,7 +6,13 @@ package frc.robot;
 
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.MoveArmToLimit;
 import frc.robot.commands.MoveArmToPosition;
+import frc.robot.commands.SetGrabber;
+import frc.robot.commands.SetGrabberExtension;
+import frc.robot.commands.SetGrabberWithIntake;
+import frc.robot.commands.WaitForInput;
+import frc.robot.commands.MoveArmToLimit.Limit;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.utils.AutonUtils;
 import frc.robot.utils.Toggle;
@@ -21,6 +27,7 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -183,30 +190,39 @@ public class RobotContainer {
     );
 
     aButton.onTrue(
-      new RunCommand(() -> {})
-      // new SequentialCommandGroup(
-        
-      // )
+      new SequentialCommandGroup(
+        new ParallelCommandGroup(
+          new SetGrabberWithIntake(m_robotArm, false, -1),
+          new MoveArmToPosition(m_robotArm, Double.NaN, Double.NaN, -0.2),
+          new MoveArmToPosition(m_robotArm, 10, Double.NaN, 0),
+          new MoveArmToPosition(m_robotArm, Double.NaN, 0, 0)
+        )
+      )
     );
 
     bButton.onTrue(
       new SequentialCommandGroup(
         new MoveArmToPosition(m_robotArm, Double.NaN, 136, Double.NaN),
-        new MoveArmToPosition(m_robotArm, -170, Double.NaN, Double.NaN)
-        //new MoveArmToPosition(m_robotArm, 0, Double.NaN, 1),
-        //new MoveArmToPosition(m_robotArm, 0, 0, 0)
+        new SetGrabber(m_robotArm, true),
+        new MoveArmToLimit(m_robotArm, Limit.BOTTOM_VERTICAL, Limit.NO_CHANGE, 0)
       )
     );
 
     xButton.onTrue(
       new SequentialCommandGroup(
-
+        new SetGrabberExtension(m_robotArm, true),
+        new MoveArmToLimit(m_robotArm, Limit.TOP_VERTICAL, Limit.NO_CHANGE, 0),
+        new WaitForInput(() -> m_operatorController.getRightBumper()),
+        new MoveArmToPosition(m_robotArm, 0, 0, 0)
       )
     );
 
     yButton.onTrue(
       new SequentialCommandGroup(
-
+        new SetGrabberExtension(m_robotArm, true),
+        new MoveArmToLimit(m_robotArm, Limit.TOP_VERTICAL, Limit.FAR_HORIZONTAL, 0),
+        new WaitForInput(() -> m_operatorController.getRightBumper()),
+        new MoveArmToPosition(m_robotArm, 0, 0, 0)
       )
     );
   }

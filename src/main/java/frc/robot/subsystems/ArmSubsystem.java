@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import frc.robot.Constants.ArmConstants;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxLimitSwitch.Type;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -23,8 +24,6 @@ public class ArmSubsystem extends SubsystemBase {
     private final DoubleSolenoid openCloseSolenoid;
 
     private final Solenoid armBrake;
-
-    private final DigitalInput armAtVericalLimit;
 
     private final double speedScaleFactor = 1.2;
     private final double intakespeedScaleFactor = 0.2;
@@ -62,8 +61,6 @@ public class ArmSubsystem extends SubsystemBase {
         this.verticalMotor.setInverted(true);
         this.horizontalMotor = new CANSparkMax(ArmConstants.horizontalMotor, MotorType.kBrushless);
         this.intakeMotor = new CANSparkMax(ArmConstants.intakeMotor, MotorType.kBrushless);
-
-        this.armAtVericalLimit = new DigitalInput(ArmConstants.upperArmLimit);
 
         this.extensionRetractionSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM,
                 ArmConstants.extensionSolenoid, ArmConstants.retractionSolenoid);
@@ -255,7 +252,19 @@ public class ArmSubsystem extends SubsystemBase {
         return this.intakeMotor.getEncoder().getPosition();
     }
 
-    public boolean atVerticalLimit() {
-        return armAtVericalLimit.get();
+    public boolean atVerticalHighLimit() {
+        return this.verticalMotor.getForwardLimitSwitch(Type.kNormallyOpen).isPressed();
+    }
+    
+    public boolean atVerticalLowLimit() {
+        return this.verticalMotor.getReverseLimitSwitch(Type.kNormallyOpen).isPressed();
+    }
+
+    public boolean atHorizontalHighLimit() {
+        return this.horizontalMotor.getForwardLimitSwitch(Type.kNormallyOpen).isPressed();
+    }
+    
+    public boolean atHorizontalLowLimit() {
+        return this.horizontalMotor.getReverseLimitSwitch(Type.kNormallyOpen).isPressed();
     }
 }
