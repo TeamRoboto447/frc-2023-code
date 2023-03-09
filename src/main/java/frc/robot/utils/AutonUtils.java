@@ -24,17 +24,17 @@ public class AutonUtils {
         switch (script) {
             case SCORE_AND_CHARGE:
                 return getScoreAndChargeStep(startingPos, step);
-            case RED_ONE:
+            case TAG_1_RED:
                 return getRedOneStep(startingPos, step);
-            case RED_TWO:
+            case TAG_2_RED:
                 return getRedTwoStep(startingPos, step);
-            case RED_THREE:
+            case TAG_3_RED:
                 return getRedThreeStep(startingPos, step);
-            case BLUE_ONE:
+            case TAG_8_BLUE:
                 return getBlueOneStep(startingPos, step);
-            case BLUE_TWO:
+            case TAG_7_BLUE:
                 return getBlueTwoStep(startingPos, step);
-            case BLUE_THREE:
+            case TAG_6_BLUE:
                 return getBlueThreeStep(startingPos, step);
             default:
                 System.out.println("How did we get here?");
@@ -100,6 +100,19 @@ public class AutonUtils {
 
     private static Trajectory getBlueTwoStep(Pose2d startingPose, int step) {
         switch (step) {
+            case 1:
+                return TrajectoryGenerator.generateTrajectory(
+                        startingPose,
+                        List.of(),
+                        new Pose2d(Units.feetToMeters(19), Units.feetToMeters(10), startingPose.getRotation()),
+                        AutoConstants.trajectoryConfig);
+            case 2:
+                return TrajectoryGenerator.generateTrajectory(
+                        startingPose,
+                        List.of(),
+                        new Pose2d(Units.feetToMeters(14.5), Units.feetToMeters(9), startingPose.getRotation()),
+                        AutoConstants.trajectoryConfig);
+ 
             default:
                 return null;
         }
@@ -167,17 +180,68 @@ public class AutonUtils {
                         new InstantCommand(
                                 () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped;
 
-            case BLUE_ONE:
+            case TAG_8_BLUE:
                 return new SequentialCommandGroup();
-            case BLUE_TWO:
+            case TAG_7_BLUE:
+            Pose2d startingPose = container.m_robotDrive.getPose(); // Setup starting pose
+            Trajectory traj1 = AutonUtils.getTrajectory(
+                    script,
+                    startingPose,
+                    1); // Get first movement trajectory
+            FollowTrajectory movement1 = new FollowTrajectory(
+                    container.m_robotDrive,
+                    traj1,
+                    startingPose.getRotation(),
+                    false); // Create a new movement command for the first movement
+
+            startingPose = new Pose2d(
+                    Units.feetToMeters(19),
+                    Units.feetToMeters(10),
+                    startingPose.getRotation()); // Update starting pose for next movement
+
+            Trajectory traj2 = AutonUtils.getTrajectory(
+                    script,
+                    startingPose,
+                    2); // Get second movement trajectory
+
+            FollowTrajectory movement2 = new FollowTrajectory(
+                    container.m_robotDrive,
+                    traj2,
+                    startingPose.getRotation(),
+                    true); // Create a new movement command for the second movement
+
+            return new SequentialCommandGroup( // This runs the movements in order
+                    new InstantCommand(
+                            () -> container.m_robotDrive.resetOdometry(
+                                    AutonUtils.getStartingPose(
+                                            traj1,
+                                            container.m_robotDrive))), // Ensure the robot is where it thinks it is
+                                                                       // if dead
+                                                                       // reckoning
+
+                    new SetGrabberExtension(container.m_robotArm, true),
+                    new SetGrabberExtensionWithIntake(container.m_robotArm, true, 1),
+                    new SetGrabberExtension(container.m_robotArm, true),
+
+                    // new SetGrabberExtension(container.m_robotArm, false),
+                    // new SetGrabber(container.m_robotArm, false),
+                    // new MoveArmToPosition(container.m_robotArm, Double.NaN,0, Double.NaN), // NaN
+                    // = don't move
+                    // new MoveArmToPosition(container.m_robotArm, 0, Double.NaN, Double.NaN), //
+                    // NaN = don't move
+
+                    // movement1, // Do First Movement
+                    // movement2, // Do second Movement
+                    new InstantCommand(
+                            () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped;
+
+            case TAG_6_BLUE:
                 return new SequentialCommandGroup();
-            case BLUE_THREE:
+            case TAG_1_RED:
                 return new SequentialCommandGroup();
-            case RED_ONE:
+            case TAG_2_RED:
                 return new SequentialCommandGroup();
-            case RED_TWO:
-                return new SequentialCommandGroup();
-            case RED_THREE:
+            case TAG_3_RED:
                 return new SequentialCommandGroup();
             default:
                 return new SequentialCommandGroup();
@@ -186,11 +250,11 @@ public class AutonUtils {
 
     public static enum Script {
         SCORE_AND_CHARGE,
-        BLUE_ONE,
-        BLUE_TWO,
-        BLUE_THREE,
-        RED_ONE,
-        RED_TWO,
-        RED_THREE
+        TAG_8_BLUE,
+        TAG_7_BLUE,
+        TAG_6_BLUE,
+        TAG_1_RED,
+        TAG_2_RED,
+        TAG_3_RED
     }
 }

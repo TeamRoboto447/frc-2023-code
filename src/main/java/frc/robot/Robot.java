@@ -37,12 +37,12 @@ public class Robot extends TimedRobot {
     PortForwarder.add(5800, "photonvision.local", 5800);
     
     m_chooser.setDefaultOption("Score & Charge", Script.SCORE_AND_CHARGE);
-    m_chooser.addOption("RED_ONE", Script.RED_ONE);
-    m_chooser.addOption("RED_TWO", Script.RED_TWO);
-    m_chooser.addOption("RED_THREE", Script.RED_THREE);
-    m_chooser.addOption("BLUE_ONE", Script.BLUE_ONE);
-    m_chooser.addOption("BLUE_TWO", Script.BLUE_TWO);
-    m_chooser.addOption("BLUE_THREE", Script.BLUE_THREE);
+    m_chooser.addOption("RED_ONE", Script.TAG_1_RED);
+    m_chooser.addOption("RED_TWO", Script.TAG_2_RED);
+    m_chooser.addOption("RED_THREE", Script.TAG_3_RED);
+    m_chooser.addOption("BLUE_ONE", Script.TAG_8_BLUE);
+    m_chooser.addOption("BLUE_TWO", Script.TAG_7_BLUE);
+    m_chooser.addOption("BLUE_THREE", Script.TAG_6_BLUE);
 
     SmartDashboard.putData(m_chooser);
   }

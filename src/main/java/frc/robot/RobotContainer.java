@@ -200,16 +200,19 @@ public class RobotContainer {
         new ParallelRaceGroup(
             new SequentialCommandGroup(
                 new SetGrabberWithIntake(m_robotArm, false, -1),
-                new MoveArmToPosition(m_robotArm, Double.NaN, Double.NaN, -0.2),
-                new MoveArmToPosition(m_robotArm, 10, Double.NaN, 0),
-                new MoveArmToPosition(m_robotArm, Double.NaN, 0, 0)),
+                //new MoveArmToPosition(m_robotArm, Double.NaN, Double.NaN, -0.2),
+                //new MoveArmToPosition(m_robotArm, 111, Double.NaN, -1),
+                new MoveArmToLimit(m_robotArm, Limit.TOP_VERTICAL, Limit.NO_CHANGE, -1),
+                new MoveArmToLimit(m_robotArm, Limit.NO_CHANGE, Limit.CLOSE_HORIZONTAL, 0),
+                new MoveArmToLimit(m_robotArm, Limit.NO_CHANGE, Limit.NO_CHANGE, 0)),
+                //new MoveArmToPosition(m_robotArm, Double.NaN, 0, 0)),
             new WaitForInput(this::shouldAbortCommand)));
 
     bButton.onTrue(
         new ParallelRaceGroup(
             new SequentialCommandGroup(
                 new SetGrabberExtension(m_robotArm, false),
-                new MoveArmToPosition(m_robotArm, Double.NaN, 116, -1),
+                new MoveArmToPosition(m_robotArm, Double.NaN, 116, 0),
                 new SetGrabber(m_robotArm, true),
                 new MoveArmToLimit(m_robotArm, Limit.BOTTOM_VERTICAL, Limit.NO_CHANGE, -1),
                 new SetGrabber(m_robotArm, false),
@@ -217,22 +220,21 @@ public class RobotContainer {
                 new MoveArmToLimit(m_robotArm, Limit.NO_CHANGE, Limit.NO_CHANGE, 0)),
             new WaitForInput(this::shouldAbortCommand)));
 
-    xButton.onTrue(
-        new ParallelRaceGroup(
-            new SequentialCommandGroup(
-                new SetGrabberExtension(m_robotArm, true),
-                new MoveArmToLimit(m_robotArm, Limit.TOP_VERTICAL, Limit.NO_CHANGE, 0),
-                new WaitForInput(() -> m_operatorController.getRightBumper()),
-                new MoveArmToPosition(m_robotArm, 0, 0, 0)),
-            new WaitForInput(this::shouldAbortCommand)));
+   // xButton.onTrue(
+   //     new ParallelRaceGroup(
+   //         new SequentialCommandGroup(
+   //             new SetGrabberExtension(m_robotArm, true),
+   //             new MoveArmToLimit(m_robotArm, Limit.TOP_VERTICAL, Limit.NO_CHANGE, 0),
+   //             new WaitForInput(() -> m_operatorController.getRightBumper()),
+   //             new MoveArmToPosition(m_robotArm, 0, 0, 0)),
+   //         new WaitForInput(this::shouldAbortCommand)));
 
-    yButton.onTrue(
-        new ParallelRaceGroup(new SequentialCommandGroup(
-            new SetGrabberExtension(m_robotArm, true),
-            // new MoveArmToLimit(m_robotArm, Limit.TOP_VERTICAL, Limit.FAR_HORIZONTAL, 0),
-            new WaitForInput(() -> m_operatorController.getRightBumper()),
-            new MoveArmToPosition(m_robotArm, 0, 0, 0)),
-            new WaitForInput(this::shouldAbortCommand)));
+   // yButton.onTrue(
+   //     new ParallelRaceGroup(new SequentialCommandGroup(
+   //         new SetGrabberExtension(m_robotArm, true),
+   //         new WaitForInput(() -> m_operatorController.getRightBumper()),
+   //         new MoveArmToPosition(m_robotArm, 0, 0, 0)),
+   //         new WaitForInput(this::shouldAbortCommand)));
   }
 
   /**
