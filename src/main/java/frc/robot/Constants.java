@@ -115,8 +115,8 @@ public final class Constants {
     public static final double horizontalRange = 63.86;
     public static final double horizontalStart = -9.6;
 
-    public static final double vertBangBangSpeed = 0.2;
-    public static final double horizBangBangSpeed = 0.2;
+    public static final double vertBangBangSpeed = 0.75;    // Vert Arm Speed
+    public static final double horizBangBangSpeed = 0.75;   // Horz Arm Speed
 
     public static final double horizontalPIDTolerance = 0.1;
     public static final double verticalPIDTolerance = 0.1;
@@ -138,8 +138,8 @@ public final class Constants {
     public static final TrajectoryConfig trajectoryConfig = new TrajectoryConfig(20, 10
     )
         .setKinematics(DriveConstants.kDriveKinematics);
-    public static PIDController xController = new PIDController(10, 0, 0);
-    public static PIDController yController = new PIDController(17, 0, 0);
+    public static PIDController xController = new PIDController(10, 0, 0);  // Drive PID
+    public static PIDController yController = new PIDController(17, 0, 0);  // Drive PID
     public static ProfiledPIDController thetaController = new ProfiledPIDController(
         0.75,
         0,
