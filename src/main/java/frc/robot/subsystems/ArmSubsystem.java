@@ -79,6 +79,8 @@ public class ArmSubsystem extends SubsystemBase {
     public void periodic() {
         this.openCloseSolenoid.set(this.grabberState);
         this.extensionRetractionSolenoid.set(this.extensionState);
+        if(this.atVerticalLowLimit()) this.verticalMotor.getEncoder().setPosition(0);
+        if(this.atHorizontalHighLimit()) this.horizontalMotor.getEncoder().setPosition(0);
     }
 
     public void setDistTarget(double target) {
