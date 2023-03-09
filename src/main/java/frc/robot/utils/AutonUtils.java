@@ -29,13 +29,13 @@ public class AutonUtils {
             case RED_TWO:
                 return getRedTwoStep(startingPos, step);
             case RED_THREE:
-                return getRedThreeStep(startingPos, step)
+                return getRedThreeStep(startingPos, step);
             case BLUE_ONE:
                 return getBlueOneStep(startingPos, step);
             case BLUE_TWO:
                 return getBlueTwoStep(startingPos, step);
             case BLUE_THREE:
-                return getBlueThreeStep(startingPos, step)
+                return getBlueThreeStep(startingPos, step);
             default:
                 System.out.println("How did we get here?");
                 return null;
