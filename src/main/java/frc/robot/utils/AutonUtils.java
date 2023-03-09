@@ -24,6 +24,18 @@ public class AutonUtils {
         switch (script) {
             case SCORE_AND_CHARGE:
                 return getScoreAndChargeStep(startingPos, step);
+            case RED_ONE:
+                return getRedOneStep(startingPos, step);
+            case RED_TWO:
+                return getRedTwoStep(startingPos, step);
+            case RED_THREE:
+                return getRedThreeStep(startingPos, step)
+            case BLUE_ONE:
+                return getBlueOneStep(startingPos, step);
+            case BLUE_TWO:
+                return getBlueTwoStep(startingPos, step);
+            case BLUE_THREE:
+                return getBlueThreeStep(startingPos, step)
             default:
                 System.out.println("How did we get here?");
                 return null;
@@ -59,37 +71,42 @@ public class AutonUtils {
     }
 
     private static Trajectory getRedOneStep(Pose2d startingPose, int step) {
-        switch(step) {
+        switch (step) {
             default:
                 return null;
         }
     }
+
     private static Trajectory getRedTwoStep(Pose2d startingPose, int step) {
-        switch(step) {
+        switch (step) {
             default:
                 return null;
         }
     }
+
     private static Trajectory getRedThreeStep(Pose2d startingPose, int step) {
-        switch(step) {
+        switch (step) {
             default:
                 return null;
         }
     }
+
     private static Trajectory getBlueOneStep(Pose2d startingPose, int step) {
-        switch(step) {
+        switch (step) {
             default:
                 return null;
         }
     }
+
     private static Trajectory getBlueTwoStep(Pose2d startingPose, int step) {
-        switch(step) {
+        switch (step) {
             default:
                 return null;
         }
     }
+
     private static Trajectory getBlueThreeStep(Pose2d startingPose, int step) {
-        switch(step) {
+        switch (step) {
             default:
                 return null;
         }
@@ -149,7 +166,7 @@ public class AutonUtils {
                         // movement2, // Do second Movement
                         new InstantCommand(
                                 () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped;
-                                
+
             case BLUE_ONE:
                 return new SequentialCommandGroup();
             case BLUE_TWO:
