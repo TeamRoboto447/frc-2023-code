@@ -237,15 +237,16 @@ public class RobotContainer {
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
+   * @param script
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
+  public Command getAutonomousCommand(Script script) {
     m_robotDrive.updateEstimationFromVision();
     return new ParallelRaceGroup( // Parallel Race Group runs commands in parallel, when one ends, they all end.
         new RunCommand(() -> updateSmartdashboard()), // This just runs a command that never ends and just updates the
                                                       // dashboard during auto
-        AutonUtils.getCommandScript(this, Script.LEAVE_COMMUNITY_AND_CHARGE)); // This gets the autonomous script
+        AutonUtils.getCommandScript(this, script)); // This gets the autonomous script
                                                                                // (usually a sequential command group)
   }
 

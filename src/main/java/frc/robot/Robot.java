@@ -6,8 +6,12 @@ package frc.robot;
 
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.utils.AutonUtils;
+import frc.robot.utils.AutonUtils.Script;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -17,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
+  private final SendableChooser<AutonUtils.Script> m_chooser = new SendableChooser<>();
 
   private RobotContainer m_robotContainer;
 
@@ -30,6 +35,16 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
     PortForwarder.add(5800, "photonvision.local", 5800);
+    
+    m_chooser.setDefaultOption("Score & Charge", Script.SCORE_AND_CHARGE);
+    m_chooser.addOption("RED_ONE", Script.RED_ONE);
+    m_chooser.addOption("RED_TWO", Script.RED_TWO);
+    m_chooser.addOption("RED_THREE", Script.RED_THREE);
+    m_chooser.addOption("BLUE_ONE", Script.BLUE_ONE);
+    m_chooser.addOption("BLUE_TWO", Script.BLUE_TWO);
+    m_chooser.addOption("BLUE_THREE", Script.BLUE_THREE);
+
+    SmartDashboard.putData(m_chooser);
   }
 
   /**
@@ -58,7 +73,8 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand(m_chooser.getSelected());
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {

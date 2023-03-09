@@ -34,8 +34,12 @@ public class MoveArmToPosition extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    this.verticalDone = Double.isNaN(targetHeight) ? true : this.runVert(targetHeight);
-    this.horizontalDone = Double.isNaN(targetDist) ? true : this.runHoriz(targetDist);
+    // this.verticalDone = Double.isNaN(targetHeight) ? true : this.armSubsystem.goToVertical(targetHeight); // PID Control
+    // this.horizontalDone = Double.isNaN(targetDist) ? true : this.armSubsystem.goToHorizontal(targetDist); // PID Control
+
+    this.verticalDone = Double.isNaN(targetHeight) ? true : this.runVert(targetHeight); // Bang Bang control
+    this.horizontalDone = Double.isNaN(targetDist) ? true : this.runHoriz(targetDist); // Bang Bang control
+    
     this.runIntake(targetIntakeSpeed);
   }
 

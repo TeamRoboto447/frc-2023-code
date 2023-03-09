@@ -24,8 +24,6 @@ public class AutonUtils {
         switch (script) {
             case SCORE_AND_CHARGE:
                 return getScoreAndChargeStep(startingPos, step);
-            case LEAVE_COMMUNITY_AND_CHARGE:
-                return getLeaveCommunityAndChargeStep(startingPos, step);
             default:
                 System.out.println("How did we get here?");
                 return null;
@@ -41,14 +39,7 @@ public class AutonUtils {
         return target + DriveConstants.angleOffset;
     }
 
-    private static Trajectory getScoreAndChargeStep(Pose2d startingPos, int step) {
-        switch (step) {
-            default:
-                return null;
-        }
-    }
-
-    private static Trajectory getLeaveCommunityAndChargeStep(Pose2d startingPose, int step) {
+    private static Trajectory getScoreAndChargeStep(Pose2d startingPose, int step) {
         switch (step) {
             case 1:
                 return TrajectoryGenerator.generateTrajectory(
@@ -67,61 +58,122 @@ public class AutonUtils {
         }
     }
 
+    private static Trajectory getRedOneStep(Pose2d startingPose, int step) {
+        switch(step) {
+            default:
+                return null;
+        }
+    }
+    private static Trajectory getRedTwoStep(Pose2d startingPose, int step) {
+        switch(step) {
+            default:
+                return null;
+        }
+    }
+    private static Trajectory getRedThreeStep(Pose2d startingPose, int step) {
+        switch(step) {
+            default:
+                return null;
+        }
+    }
+    private static Trajectory getBlueOneStep(Pose2d startingPose, int step) {
+        switch(step) {
+            default:
+                return null;
+        }
+    }
+    private static Trajectory getBlueTwoStep(Pose2d startingPose, int step) {
+        switch(step) {
+            default:
+                return null;
+        }
+    }
+    private static Trajectory getBlueThreeStep(Pose2d startingPose, int step) {
+        switch(step) {
+            default:
+                return null;
+        }
+    }
+
     public static Command getCommandScript(RobotContainer container, Script script) {
-        Pose2d startingPose = container.m_robotDrive.getPose(); // Setup starting pose
-        Trajectory traj1 = AutonUtils.getTrajectory(
-                Script.LEAVE_COMMUNITY_AND_CHARGE,
-                startingPose,
-                1); // Get first movement trajectory
-        FollowTrajectory movement1 = new FollowTrajectory(
-                container.m_robotDrive,
-                traj1,
-                startingPose.getRotation(),
-                false); // Create a new movement command for the first movement
+        switch (script) {
+            case SCORE_AND_CHARGE:
+                Pose2d startingPose = container.m_robotDrive.getPose(); // Setup starting pose
+                Trajectory traj1 = AutonUtils.getTrajectory(
+                        script,
+                        startingPose,
+                        1); // Get first movement trajectory
+                FollowTrajectory movement1 = new FollowTrajectory(
+                        container.m_robotDrive,
+                        traj1,
+                        startingPose.getRotation(),
+                        false); // Create a new movement command for the first movement
 
-        startingPose = new Pose2d(
-                Units.feetToMeters(19),
-                Units.feetToMeters(10),
-                startingPose.getRotation()); // Update starting pose for next movement
+                startingPose = new Pose2d(
+                        Units.feetToMeters(19),
+                        Units.feetToMeters(10),
+                        startingPose.getRotation()); // Update starting pose for next movement
 
-        Trajectory traj2 = AutonUtils.getTrajectory(
-                Script.LEAVE_COMMUNITY_AND_CHARGE,
-                startingPose,
-                2); // Get second movement trajectory
+                Trajectory traj2 = AutonUtils.getTrajectory(
+                        script,
+                        startingPose,
+                        2); // Get second movement trajectory
 
-        FollowTrajectory movement2 = new FollowTrajectory(
-                container.m_robotDrive,
-                traj2,
-                startingPose.getRotation(),
-                true); // Create a new movement command for the second movement
+                FollowTrajectory movement2 = new FollowTrajectory(
+                        container.m_robotDrive,
+                        traj2,
+                        startingPose.getRotation(),
+                        true); // Create a new movement command for the second movement
 
-        return new SequentialCommandGroup( // This runs the movements in order
-                new InstantCommand(
-                        () -> container.m_robotDrive.resetOdometry(
-                                AutonUtils.getStartingPose(
-                                        traj1,
-                                        container.m_robotDrive))), // Ensure the robot is where it thinks it is if dead
-                                                                   // reckoning
+                return new SequentialCommandGroup( // This runs the movements in order
+                        new InstantCommand(
+                                () -> container.m_robotDrive.resetOdometry(
+                                        AutonUtils.getStartingPose(
+                                                traj1,
+                                                container.m_robotDrive))), // Ensure the robot is where it thinks it is
+                                                                           // if dead
+                                                                           // reckoning
 
-                new SetGrabberExtension(container.m_robotArm, true),
-                new SetGrabberExtensionWithIntake(container.m_robotArm, true, 1),
-                new SetGrabberExtension(container.m_robotArm, true),
- 
-                //new SetGrabberExtension(container.m_robotArm, false),
-                //new SetGrabber(container.m_robotArm, false),
-                //new MoveArmToPosition(container.m_robotArm, Double.NaN,0, Double.NaN), // NaN
-                // = don't move
-                // new MoveArmToPosition(container.m_robotArm, 0, Double.NaN, Double.NaN), //
-                // NaN = don't move
+                        new SetGrabberExtension(container.m_robotArm, true),
+                        new SetGrabberExtensionWithIntake(container.m_robotArm, true, 1),
+                        new SetGrabberExtension(container.m_robotArm, true),
 
-                // movement1, // Do First Movement
-                // movement2, // Do second Movement
-                new InstantCommand(
-                        () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped
+                        // new SetGrabberExtension(container.m_robotArm, false),
+                        // new SetGrabber(container.m_robotArm, false),
+                        // new MoveArmToPosition(container.m_robotArm, Double.NaN,0, Double.NaN), // NaN
+                        // = don't move
+                        // new MoveArmToPosition(container.m_robotArm, 0, Double.NaN, Double.NaN), //
+                        // NaN = don't move
+
+                        // movement1, // Do First Movement
+                        // movement2, // Do second Movement
+                        new InstantCommand(
+                                () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped;
+                                
+            case BLUE_ONE:
+                return new SequentialCommandGroup();
+            case BLUE_TWO:
+                return new SequentialCommandGroup();
+            case BLUE_THREE:
+                return new SequentialCommandGroup();
+            case RED_ONE:
+                return new SequentialCommandGroup();
+            case RED_TWO:
+                return new SequentialCommandGroup();
+            case RED_THREE:
+                return new SequentialCommandGroup();
+            default:
+                return new SequentialCommandGroup();
+        }
     }
 
     public static enum Script {
         SCORE_AND_CHARGE,
-        LEAVE_COMMUNITY_AND_CHARGE
+        BLUE_ONE,
+        BLUE_TWO,
+        BLUE_THREE,
+        RED_ONE,
+        RED_TWO,
+        RED_THREE
     }
 }
