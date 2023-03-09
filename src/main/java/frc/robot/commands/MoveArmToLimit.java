@@ -60,11 +60,13 @@ public class MoveArmToLimit extends CommandBase {
 
   private boolean runVert(double speed) {
     this.armSubsystem.rawMoveVertical(speed);
+    this.armSubsystem.setVertTarget(this.armSubsystem.getVertEncoder());
     return speed > 0 ? this.armSubsystem.atVerticalHighLimit() : this.armSubsystem.atVerticalLowLimit();
   }
 
   private boolean runHoriz(double speed) {
     this.armSubsystem.rawMoveHorizontal(speed);
+    this.armSubsystem.setDistTarget(this.armSubsystem.getHorizontalEncoder());
     return speed > 0 ? this.armSubsystem.atHorizontalHighLimit() : this.armSubsystem.atHorizontalLowLimit();
   }
 

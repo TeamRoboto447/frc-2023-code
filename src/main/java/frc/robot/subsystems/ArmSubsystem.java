@@ -81,6 +81,14 @@ public class ArmSubsystem extends SubsystemBase {
         this.extensionRetractionSolenoid.set(this.extensionState);
     }
 
+    public void setDistTarget(double target) {
+        this.currentDistTarget = target;
+    }
+    
+    public void setVertTarget(double target) {
+        this.currentHeightTarget = target;
+    }
+
     public void moveVertical(double speed) {
         currentHeightTarget += speed * speedScaleFactor;
         this.setLastVertTeleopPos(currentHeightTarget);
