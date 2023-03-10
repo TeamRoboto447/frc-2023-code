@@ -79,7 +79,7 @@ public class AutonUtils {
                         new Pose2d(Units.feetToMeters(33), Units.feetToMeters(8), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
             case 2:
-                return TrajectoryGenerator.generateTrajectory(
+            return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
                         new Pose2d(Units.feetToMeters(33), Units.feetToMeters(8), startingPose.getRotation()),
@@ -91,14 +91,40 @@ public class AutonUtils {
 
     private static Trajectory getTagTwoStep(Pose2d startingPose, int step) {
         switch (step) {
-            default:
+                case 1:
+                    return TrajectoryGenerator.generateTrajectory(
+                            startingPose,
+                            List.of(),
+                            new Pose2d(Units.feetToMeters(36.6), Units.feetToMeters(10), startingPose.getRotation()),
+                            AutoConstants.trajectoryConfig);
+                case 2:
+                    return TrajectoryGenerator.generateTrajectory(
+                            startingPose,
+                            List.of(),
+                            new Pose2d(Units.feetToMeters(42.1), Units.feetToMeters(10), startingPose.getRotation()),
+                            AutoConstants.trajectoryConfig);
+    
+                default:
                 return null;
         }
     }
 
     private static Trajectory getTagThreeStep(Pose2d startingPose, int step) {
         switch (step) {
-            default:
+                case 1:
+                    return TrajectoryGenerator.generateTrajectory(
+                            startingPose,
+                            List.of(),
+                            new Pose2d(Units.feetToMeters(38), Units.feetToMeters(15), startingPose.getRotation()),
+                            AutoConstants.trajectoryConfig);
+                case 2:
+                    return TrajectoryGenerator.generateTrajectory(
+                            startingPose,
+                            List.of(),
+                            new Pose2d(Units.feetToMeters(38), Units.feetToMeters(15), startingPose.getRotation()),
+                            AutoConstants.trajectoryConfig);
+    
+                default:
                 return null;
         }
     }
@@ -384,8 +410,8 @@ public class AutonUtils {
                     true); // Create a new movement command for the first movement
 
             startingPose = new Pose2d(
-                    Units.feetToMeters(22),
-                    Units.feetToMeters(4),
+                    Units.feetToMeters(33),
+                    Units.feetToMeters(8),
                     startingPose.getRotation()); // Update starting pose for next movement
 
             Trajectory tag_1_traj2 = AutonUtils.getTrajectory(
@@ -436,7 +462,7 @@ public class AutonUtils {
                     false); // Create a new movement command for the first movement
 
             startingPose = new Pose2d(
-                    Units.feetToMeters(19),
+                    Units.feetToMeters(38.6),
                     Units.feetToMeters(10),
                     startingPose.getRotation()); // Update starting pose for next movement
 
@@ -489,8 +515,8 @@ public class AutonUtils {
                     true); // Create a new movement command for the first movement
 
             startingPose = new Pose2d(
-                    Units.feetToMeters(20),
-                    Units.feetToMeters(14),
+                    Units.feetToMeters(38),
+                    Units.feetToMeters(15),
                     startingPose.getRotation()); // Update starting pose for next movement
 
             Trajectory tag_3_traj2 = AutonUtils.getTrajectory(
