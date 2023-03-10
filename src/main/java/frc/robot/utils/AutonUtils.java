@@ -72,7 +72,19 @@ public class AutonUtils {
 
     private static Trajectory getTagOneStep(Pose2d startingPose, int step) {
         switch (step) {
-            default:
+                case 1:
+                return TrajectoryGenerator.generateTrajectory(
+                        startingPose,
+                        List.of(),
+                        new Pose2d(Units.feetToMeters(33), Units.feetToMeters(8), startingPose.getRotation()),
+                        AutoConstants.trajectoryConfig);
+            case 2:
+                return TrajectoryGenerator.generateTrajectory(
+                        startingPose,
+                        List.of(),
+                        new Pose2d(Units.feetToMeters(33), Units.feetToMeters(8), startingPose.getRotation()),
+                        AutoConstants.trajectoryConfig);
+                default:
                 return null;
         }
     }
@@ -93,6 +105,19 @@ public class AutonUtils {
 
     private static Trajectory getTagSixStep(Pose2d startingPose, int step) {
         switch (step) {
+                case 1:
+                return TrajectoryGenerator.generateTrajectory(
+                        startingPose,
+                        List.of(),
+                        new Pose2d(Units.feetToMeters(20), Units.feetToMeters(16), startingPose.getRotation()),
+                        AutoConstants.trajectoryConfig);
+            case 2:
+                return TrajectoryGenerator.generateTrajectory(
+                        startingPose,
+                        List.of(),
+                        new Pose2d(Units.feetToMeters(20), Units.feetToMeters(16), startingPose.getRotation()),
+                        AutoConstants.trajectoryConfig);
+
             default:
                 return null;
         }
@@ -110,7 +135,7 @@ public class AutonUtils {
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(14.5), Units.feetToMeters(9), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(14.5), Units.feetToMeters(10), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
 
             default:
@@ -120,7 +145,20 @@ public class AutonUtils {
 
     private static Trajectory getTagEightStep(Pose2d startingPose, int step) {
         switch (step) {
-            default:
+                case 1:
+                return TrajectoryGenerator.generateTrajectory(
+                        startingPose,
+                        List.of(),
+                        new Pose2d(Units.feetToMeters(22), Units.feetToMeters(4), startingPose.getRotation()),
+                        AutoConstants.trajectoryConfig);
+            case 2:
+                return TrajectoryGenerator.generateTrajectory(
+                        startingPose,
+                        List.of(),
+                        new Pose2d(Units.feetToMeters(22), Units.feetToMeters(4), startingPose.getRotation()),
+                        AutoConstants.trajectoryConfig);
+
+                default:
                 return null;
         }
     }
@@ -191,11 +229,11 @@ public class AutonUtils {
                     container.m_robotDrive,
                     tag_8_traj1,
                     startingPose.getRotation(),
-                    false); // Create a new movement command for the first movement
+                    true); // Create a new movement command for the first movement
 
             startingPose = new Pose2d(
-                    Units.feetToMeters(19),
-                    Units.feetToMeters(10),
+                    Units.feetToMeters(22),
+                    Units.feetToMeters(4),
                     startingPose.getRotation()); // Update starting pose for next movement
 
             Trajectory tag_8_traj2 = AutonUtils.getTrajectory(
@@ -229,8 +267,8 @@ public class AutonUtils {
                     // new MoveArmToPosition(container.m_robotArm, 0, Double.NaN, Double.NaN), //
                     // NaN = don't move
 
-                    // tag_7_movement1, // Do First Movement
-                    // tag_7_movement2, // Do second Movement
+                    tag_8_movement1, // Do First Movement
+                   // tag_8_movement2, // Do second Movement
                     new InstantCommand(
                             () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped;
             case TAG_7_BLUE:
@@ -281,8 +319,8 @@ public class AutonUtils {
                         // new MoveArmToPosition(container.m_robotArm, 0, Double.NaN, Double.NaN), //
                         // NaN = don't move
 
-                        // tag_7_movement1, // Do First Movement
-                        // tag_7_movement2, // Do second Movement
+                        tag_7_movement1, // Do First Movement
+                        tag_7_movement2, // Do second Movement
                         new InstantCommand(
                                 () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped;
 
@@ -297,11 +335,11 @@ public class AutonUtils {
                     container.m_robotDrive,
                     tag_6_traj1,
                     startingPose.getRotation(),
-                    false); // Create a new movement command for the first movement
+                    true); // Create a new movement command for the first movement
 
             startingPose = new Pose2d(
-                    Units.feetToMeters(19),
-                    Units.feetToMeters(10),
+                    Units.feetToMeters(20),
+                    Units.feetToMeters(14),
                     startingPose.getRotation()); // Update starting pose for next movement
 
             Trajectory tag_6_traj2 = AutonUtils.getTrajectory(
@@ -310,7 +348,7 @@ public class AutonUtils {
                     2); // Get second movement trajectory
 
             FollowTrajectory tag_6_movement2 = new FollowTrajectory(
-                    container.m_robotDrive,
+                 container.m_robotDrive,
                     tag_6_traj2,
                     startingPose.getRotation(),
                     true); // Create a new movement command for the second movement
@@ -327,16 +365,9 @@ public class AutonUtils {
                     new SetGrabberExtension(container.m_robotArm, true),
                     new SetGrabberExtensionWithIntake(container.m_robotArm, true, 1),
                     new SetGrabberExtension(container.m_robotArm, true),
-
-                    // new SetGrabberExtension(container.m_robotArm, false),
-                    // new SetGrabber(container.m_robotArm, false),
-                    // new MoveArmToPosition(container.m_robotArm, Double.NaN,0, Double.NaN), // NaN
-                    // = don't move
-                    // new MoveArmToPosition(container.m_robotArm, 0, Double.NaN, Double.NaN), //
-                    // NaN = don't move
-
-                    // tag_7_movement1, // Do First Movement
-                    // tag_7_movement2, // Do second Movement
+                    
+                    tag_6_movement1, // Do First Movement
+                   // tag_6_movement2, // Do second Movement
                     new InstantCommand(
                             () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped;
             case TAG_1_RED:
@@ -350,11 +381,11 @@ public class AutonUtils {
                         container.m_robotDrive,
                         tag_1_traj1,
                         startingPose.getRotation(),
-                        false); // Create a new movement command for the first movement
+                        true); // Create a new movement command for the first movement
 
                 startingPose = new Pose2d(
-                        Units.feetToMeters(19),
-                        Units.feetToMeters(10),
+                        Units.feetToMeters(33),
+                        Units.feetToMeters(8),
                         startingPose.getRotation()); // Update starting pose for next movement
 
                 Trajectory tag_1_traj2 = AutonUtils.getTrajectory(
@@ -388,8 +419,8 @@ public class AutonUtils {
                         // new MoveArmToPosition(container.m_robotArm, 0, Double.NaN, Double.NaN), //
                         // NaN = don't move
 
-                        // tag_7_movement1, // Do First Movement
-                        // tag_7_movement2, // Do second Movement
+                         tag_1_movement1, // Do First Movement
+                         tag_1_movement2, // Do second Movement
                         new InstantCommand(
                                 () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped;
             case TAG_2_RED:
@@ -441,8 +472,8 @@ public class AutonUtils {
                     // new MoveArmToPosition(container.m_robotArm, 0, Double.NaN, Double.NaN), //
                     // NaN = don't move
 
-                    // tag_7_movement1, // Do First Movement
-                    // tag_7_movement2, // Do second Movement
+                    // tag_2_movement1, // Do First Movement
+                    // tag_2_movement2, // Do second Movement
                     new InstantCommand(
                             () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped;
             case TAG_3_RED:
@@ -494,8 +525,8 @@ public class AutonUtils {
                     // new MoveArmToPosition(container.m_robotArm, 0, Double.NaN, Double.NaN), //
                     // NaN = don't move
 
-                    // tag_7_movement1, // Do First Movement
-                    // tag_7_movement2, // Do second Movement
+                    // tag_3_movement1, // Do First Movement
+                    // tag_3_movement2, // Do second Movement
                     new InstantCommand(
                             () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped;
             default:
