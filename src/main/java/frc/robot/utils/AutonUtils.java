@@ -371,60 +371,59 @@ public class AutonUtils {
                     new InstantCommand(
                             () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped;
             case TAG_1_RED:
-        
-                startingPose = container.m_robotDrive.getPose(); // Setup starting pose
-                Trajectory tag_1_traj1 = AutonUtils.getTrajectory(
-                        script,
-                        startingPose,
-                        1); // Get first movement trajectory
-                FollowTrajectory tag_1_movement1 = new FollowTrajectory(
-                        container.m_robotDrive,
-                        tag_1_traj1,
-                        startingPose.getRotation(),
-                        true); // Create a new movement command for the first movement
-
-                startingPose = new Pose2d(
-                        Units.feetToMeters(33),
-                        Units.feetToMeters(8),
-                        startingPose.getRotation()); // Update starting pose for next movement
-
-                Trajectory tag_1_traj2 = AutonUtils.getTrajectory(
-                        script,
-                        startingPose,
-                        2); // Get second movement trajectory
-
-                FollowTrajectory tag_1_movement2 = new FollowTrajectory(
-                        container.m_robotDrive,
-                        tag_1_traj2,
-                        startingPose.getRotation(),
-                        true); // Create a new movement command for the second movement
-
-                return new SequentialCommandGroup( // This runs the movements in order
-                        new InstantCommand(
-                                () -> container.m_robotDrive.resetOdometry(
-                                        AutonUtils.getStartingPose(
-                                            tag_1_traj1,
-                                                container.m_robotDrive))), // Ensure the robot is where it thinks it is
-                                                                           // if dead
-                                                                           // reckoning
-
-                        new SetGrabberExtension(container.m_robotArm, true),
-                        new SetGrabberExtensionWithIntake(container.m_robotArm, true, 1),
-                        new SetGrabberExtension(container.m_robotArm, true),
-
-                        // new SetGrabberExtension(container.m_robotArm, false),
-                        // new SetGrabber(container.m_robotArm, false),
-                        // new MoveArmToPosition(container.m_robotArm, Double.NaN,0, Double.NaN), // NaN
-                        // = don't move
-                        // new MoveArmToPosition(container.m_robotArm, 0, Double.NaN, Double.NaN), //
-                        // NaN = don't move
-
-                         tag_1_movement1, // Do First Movement
-                         tag_1_movement2, // Do second Movement
-                        new InstantCommand(
-                                () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped;
-            case TAG_2_RED:
             
+            startingPose = container.m_robotDrive.getPose(); // Setup starting pose
+            Trajectory tag_1_traj1 = AutonUtils.getTrajectory(
+                    script,
+                    startingPose,
+                    1); // Get first movement trajectory
+            FollowTrajectory tag_1_movement1 = new FollowTrajectory(
+                    container.m_robotDrive,
+                    tag_1_traj1,
+                    startingPose.getRotation(),
+                    true); // Create a new movement command for the first movement
+
+            startingPose = new Pose2d(
+                    Units.feetToMeters(22),
+                    Units.feetToMeters(4),
+                    startingPose.getRotation()); // Update starting pose for next movement
+
+            Trajectory tag_1_traj2 = AutonUtils.getTrajectory(
+                    script,
+                    startingPose,
+                    2); // Get second movement trajectory
+
+            FollowTrajectory tag_1_movement2 = new FollowTrajectory(
+                    container.m_robotDrive,
+                    tag_1_traj2,
+                    startingPose.getRotation(),
+                    true); // Create a new movement command for the second movement
+
+            return new SequentialCommandGroup( // This runs the movements in order
+                    new InstantCommand(
+                            () -> container.m_robotDrive.resetOdometry(
+                                    AutonUtils.getStartingPose(
+                                        tag_1_traj1,
+                                            container.m_robotDrive))), // Ensure the robot is where it thinks it is
+                                                                       // if dead
+                                                                       // reckoning
+
+                    new SetGrabberExtension(container.m_robotArm, true),
+                    new SetGrabberExtensionWithIntake(container.m_robotArm, true, 1),
+                    new SetGrabberExtension(container.m_robotArm, true),
+
+                    // new SetGrabberExtension(container.m_robotArm, false),
+                    // new SetGrabber(container.m_robotArm, false),
+                    // new MoveArmToPosition(container.m_robotArm, Double.NaN,0, Double.NaN), // NaN
+                    // = don't move
+                    // new MoveArmToPosition(container.m_robotArm, 0, Double.NaN, Double.NaN), //
+                    // NaN = don't move
+
+                    tag_1_movement1, // Do First Movement
+                   // tag_1_movement2, // Do second Movement
+                    new InstantCommand(
+                            () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped;
+            case TAG_2_RED:
             startingPose = container.m_robotDrive.getPose(); // Setup starting pose
             Trajectory tag_2_traj1 = AutonUtils.getTrajectory(
                     script,
@@ -472,8 +471,8 @@ public class AutonUtils {
                     // new MoveArmToPosition(container.m_robotArm, 0, Double.NaN, Double.NaN), //
                     // NaN = don't move
 
-                    // tag_2_movement1, // Do First Movement
-                    // tag_2_movement2, // Do second Movement
+                    tag_2_movement1, // Do First Movement
+                    tag_2_movement2, // Do second Movement
                     new InstantCommand(
                             () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped;
             case TAG_3_RED:
@@ -487,11 +486,11 @@ public class AutonUtils {
                     container.m_robotDrive,
                     tag_3_traj1,
                     startingPose.getRotation(),
-                    false); // Create a new movement command for the first movement
+                    true); // Create a new movement command for the first movement
 
             startingPose = new Pose2d(
-                    Units.feetToMeters(19),
-                    Units.feetToMeters(10),
+                    Units.feetToMeters(20),
+                    Units.feetToMeters(14),
                     startingPose.getRotation()); // Update starting pose for next movement
 
             Trajectory tag_3_traj2 = AutonUtils.getTrajectory(
@@ -500,7 +499,7 @@ public class AutonUtils {
                     2); // Get second movement trajectory
 
             FollowTrajectory tag_3_movement2 = new FollowTrajectory(
-                    container.m_robotDrive,
+                 container.m_robotDrive,
                     tag_3_traj2,
                     startingPose.getRotation(),
                     true); // Create a new movement command for the second movement
@@ -517,16 +516,9 @@ public class AutonUtils {
                     new SetGrabberExtension(container.m_robotArm, true),
                     new SetGrabberExtensionWithIntake(container.m_robotArm, true, 1),
                     new SetGrabberExtension(container.m_robotArm, true),
-
-                    // new SetGrabberExtension(container.m_robotArm, false),
-                    // new SetGrabber(container.m_robotArm, false),
-                    // new MoveArmToPosition(container.m_robotArm, Double.NaN,0, Double.NaN), // NaN
-                    // = don't move
-                    // new MoveArmToPosition(container.m_robotArm, 0, Double.NaN, Double.NaN), //
-                    // NaN = don't move
-
-                    // tag_3_movement1, // Do First Movement
-                    // tag_3_movement2, // Do second Movement
+                    
+                    tag_3_movement1, // Do First Movement
+                   // tag_3_movement2, // Do second Movement
                     new InstantCommand(
                             () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped;
             default:
