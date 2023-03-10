@@ -257,21 +257,21 @@ public class AutonUtils {
                     startingPose.getRotation(),
                     true); // Create a new movement command for the first movement
 
-            startingPose = new Pose2d(
-                    Units.feetToMeters(22),
-                    Units.feetToMeters(4),
-                    startingPose.getRotation()); // Update starting pose for next movement
+        //     startingPose = new Pose2d(
+        //             Units.feetToMeters(22),
+        //             Units.feetToMeters(4),
+        //             startingPose.getRotation()); // Update starting pose for next movement
 
-            Trajectory tag_8_traj2 = AutonUtils.getTrajectory(
-                    script,
-                    startingPose,
-                    2); // Get second movement trajectory
+        //     Trajectory tag_8_traj2 = AutonUtils.getTrajectory(
+        //             script,
+        //             startingPose,
+        //             2); // Get second movement trajectory
 
-            FollowTrajectory tag_8_movement2 = new FollowTrajectory(
-                    container.m_robotDrive,
-                    tag_8_traj2,
-                    startingPose.getRotation(),
-                    true); // Create a new movement command for the second movement
+        //     FollowTrajectory tag_8_movement2 = new FollowTrajectory(
+        //             container.m_robotDrive,
+        //             tag_8_traj2,
+        //             startingPose.getRotation(),
+        //             true); // Create a new movement command for the second movement
 
             return new SequentialCommandGroup( // This runs the movements in order
                     new InstantCommand(
@@ -363,21 +363,21 @@ public class AutonUtils {
                     startingPose.getRotation(),
                     true); // Create a new movement command for the first movement
 
-            startingPose = new Pose2d(
-                    Units.feetToMeters(20),
-                    Units.feetToMeters(14),
-                    startingPose.getRotation()); // Update starting pose for next movement
+        //     startingPose = new Pose2d(
+        //             Units.feetToMeters(20),
+        //             Units.feetToMeters(14),
+        //             startingPose.getRotation()); // Update starting pose for next movement
 
-            Trajectory tag_6_traj2 = AutonUtils.getTrajectory(
-                    script,
-                    startingPose,
-                    2); // Get second movement trajectory
+        //     Trajectory tag_6_traj2 = AutonUtils.getTrajectory(
+        //             script,
+        //             startingPose,
+        //             2); // Get second movement trajectory
 
-            FollowTrajectory tag_6_movement2 = new FollowTrajectory(
-                 container.m_robotDrive,
-                    tag_6_traj2,
-                    startingPose.getRotation(),
-                    true); // Create a new movement command for the second movement
+        //     FollowTrajectory tag_6_movement2 = new FollowTrajectory(
+        //          container.m_robotDrive,
+        //             tag_6_traj2,
+        //             startingPose.getRotation(),
+        //             true); // Create a new movement command for the second movement
 
             return new SequentialCommandGroup( // This runs the movements in order
                     new InstantCommand(
