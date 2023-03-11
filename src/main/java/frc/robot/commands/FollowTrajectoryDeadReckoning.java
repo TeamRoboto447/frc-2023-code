@@ -12,13 +12,12 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.utils.AutonUtils;
 
-public class FollowTrajectory extends SwerveControllerCommand {
+public class FollowTrajectoryDeadReckoning extends SwerveControllerCommand {
   /** Creates a new FollowTrajectory. */
   private final DriveSubsystem driveSubsystem;
-  private final Trajectory trajectory;
   private final boolean finalMovement;
-  public FollowTrajectory(DriveSubsystem dSubsystem, Trajectory traj, Rotation2d rotation, boolean lastMove) {
-    super(traj, dSubsystem::getPose, DriveConstants.kDriveKinematics, AutoConstants.xController, AutoConstants.yController, AutoConstants.thetaController, () -> rotation, dSubsystem::setModuleStates, dSubsystem);
+  public FollowTrajectoryDeadReckoning(DriveSubsystem dSubsystem, Trajectory traj, Rotation2d rotation, boolean lastMove) {
+    super(traj, dSubsystem::getRawOdometryPose, DriveConstants.kDriveKinematics, AutoConstants.xController, AutoConstants.yController, AutoConstants.thetaController, () -> rotation, dSubsystem::setModuleStates, dSubsystem);
     // Use addRequirements() here to declare subsystem dependencies.
     this.driveSubsystem = dSubsystem;
     this.trajectory = traj;

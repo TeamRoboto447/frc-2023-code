@@ -12,7 +12,9 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.commands.FollowTrajectory;
+import frc.robot.commands.FollowTrajectoryDeadReckoning;
+import frc.robot.commands.FollowTrajectoryOdometry;
+import frc.robot.commands.LockRobot;
 import frc.robot.commands.MoveArmToPosition;
 import frc.robot.commands.SetGrabber;
 import frc.robot.commands.SetGrabberExtension;
@@ -22,8 +24,10 @@ import frc.robot.subsystems.DriveSubsystem;
 public class AutonUtils {
     private static Trajectory getTrajectory(Script script, Pose2d startingPos, int step) {
         switch (script) {
-            case SCORE_AND_CHARGE:
-                return getScoreAndChargeStep(startingPos, step);
+            case SCORE_AND_CHARGE_LONG:
+                return getScoreAndChargeLongStep(startingPos, step);
+            case SCORE_AND_CHARGE_SHORT:
+                return getScoreAndChargeShortStep(startingPos, step);
             case TAG_1_RED:
                 return getTagOneStep(startingPos, step);
             case TAG_2_RED:
@@ -51,19 +55,26 @@ public class AutonUtils {
         return target + DriveConstants.angleOffset;
     }
 
-    private static Trajectory getScoreAndChargeStep(Pose2d startingPose, int step) {
+    private static Trajectory getScoreAndChargeLongStep(Pose2d startingPose, int step) {
         switch (step) {
             case 1:
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(19), Units.feetToMeters(10), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(0), Units.feetToMeters(15), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
-            case 2:
+            default:
+                return null;
+        }
+    }
+
+    private static Trajectory getScoreAndChargeShortStep(Pose2d startingPose, int step) {
+        switch (step) {
+            case 1:
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(14.5), Units.feetToMeters(9), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(0), Units.feetToMeters(9.5), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
             default:
                 return null;
@@ -78,12 +89,6 @@ public class AutonUtils {
                         List.of(),
                         new Pose2d(Units.feetToMeters(33), Units.feetToMeters(8), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
-        //     case 2:
-        //     return TrajectoryGenerator.generateTrajectory(
-        //                 startingPose,
-        //                 List.of(),
-        //                 new Pose2d(Units.feetToMeters(33), Units.feetToMeters(8), startingPose.getRotation()),
-        //                 AutoConstants.trajectoryConfig);
                 default:
                 return null;
         }
@@ -117,12 +122,6 @@ public class AutonUtils {
                             List.of(),
                             new Pose2d(Units.feetToMeters(38), Units.feetToMeters(15), startingPose.getRotation()),
                             AutoConstants.trajectoryConfig);
-                // case 2:
-                //     return TrajectoryGenerator.generateTrajectory(
-                //             startingPose,
-                //             List.of(),
-                //             new Pose2d(Units.feetToMeters(38), Units.feetToMeters(15), startingPose.getRotation()),
-                //             AutoConstants.trajectoryConfig);
     
                 default:
                 return null;
@@ -192,38 +191,23 @@ public class AutonUtils {
     public static Command getCommandScript(RobotContainer container, Script script) {
         Pose2d startingPose = container.m_robotDrive.getPose();
         switch (script) {
-            case SCORE_AND_CHARGE:
-                Trajectory score_and_charge_traj1 = AutonUtils.getTrajectory(
+            case SCORE_AND_CHARGE_LONG:
+                Trajectory score_and_charge_long_traj1 = AutonUtils.getTrajectory(
                         script,
                         startingPose,
                         1); // Get first movement trajectory
-                FollowTrajectory score_and_charge_movement1 = new FollowTrajectory(
+                        FollowTrajectoryDeadReckoning score_and_charge_long_movement1 = new FollowTrajectoryDeadReckoning(
                         container.m_robotDrive,
-                        score_and_charge_traj1,
+                        score_and_charge_long_traj1,
                         startingPose.getRotation(),
                         false); // Create a new movement command for the first movement
 
-                startingPose = new Pose2d(
-                        Units.feetToMeters(19),
-                        Units.feetToMeters(10),
-                        startingPose.getRotation()); // Update starting pose for next movement
-
-                Trajectory score_and_charge_traj2 = AutonUtils.getTrajectory(
-                        script,
-                        startingPose,
-                        2); // Get second movement trajectory
-
-                FollowTrajectory score_and_charge_movement2 = new FollowTrajectory(
-                        container.m_robotDrive,
-                        score_and_charge_traj2,
-                        startingPose.getRotation(),
-                        true); // Create a new movement command for the second movement
 
                 return new SequentialCommandGroup( // This runs the movements in order
                         new InstantCommand(
                                 () -> container.m_robotDrive.resetOdometry(
                                         AutonUtils.getStartingPose(
-                                            score_and_charge_traj1,
+                                            score_and_charge_long_traj1,
                                                 container.m_robotDrive))), // Ensure the robot is where it thinks it is
                                                                            // if dead
                                                                            // reckoning
@@ -231,18 +215,34 @@ public class AutonUtils {
                         new SetGrabberExtension(container.m_robotArm, true),
                         new SetGrabberExtensionWithIntake(container.m_robotArm, true, 1),
                         new SetGrabberExtension(container.m_robotArm, true),
+                        score_and_charge_long_movement1,
+                        new LockRobot(container.m_robotArm, container.m_robotDrive));
+            case SCORE_AND_CHARGE_SHORT:
+                Trajectory score_and_charge_short_traj1 = AutonUtils.getTrajectory(
+                        script,
+                        startingPose,
+                        1); // Get first movement trajectory
+                        FollowTrajectoryDeadReckoning score_and_charge_short_movement1 = new FollowTrajectoryDeadReckoning(
+                        container.m_robotDrive,
+                        score_and_charge_short_traj1,
+                        startingPose.getRotation(),
+                        false); // Create a new movement command for the first movement
 
-                        // new SetGrabberExtension(container.m_robotArm, false),
-                        // new SetGrabber(container.m_robotArm, false),
-                        // new MoveArmToPosition(container.m_robotArm, Double.NaN,0, Double.NaN), // NaN
-                        // = don't move
-                        // new MoveArmToPosition(container.m_robotArm, 0, Double.NaN, Double.NaN), //
-                        // NaN = don't move
 
-                        // score_and_charge_movement1, // Do First Movement
-                        // score_and_charge_movement2, // Do second Movement
+                return new SequentialCommandGroup( // This runs the movements in order
                         new InstantCommand(
-                                () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped;
+                                () -> container.m_robotDrive.resetOdometry(
+                                        AutonUtils.getStartingPose(
+                                            score_and_charge_short_traj1,
+                                                container.m_robotDrive))), // Ensure the robot is where it thinks it is
+                                                                           // if dead
+                                                                           // reckoning
+
+                        new SetGrabberExtension(container.m_robotArm, true),
+                        new SetGrabberExtensionWithIntake(container.m_robotArm, true, 1),
+                        new SetGrabberExtension(container.m_robotArm, true),
+                        score_and_charge_short_movement1,
+                        new LockRobot(container.m_robotArm, container.m_robotDrive));
 
             case TAG_8_BLUE:
             
@@ -251,7 +251,7 @@ public class AutonUtils {
                     script,
                     startingPose,
                     1); // Get first movement trajectory
-            FollowTrajectory tag_8_movement1 = new FollowTrajectory(
+            FollowTrajectoryOdometry tag_8_movement1 = new FollowTrajectoryOdometry(
                     container.m_robotDrive,
                     tag_8_traj1,
                     startingPose.getRotation(),
@@ -303,7 +303,7 @@ public class AutonUtils {
                         script,
                         startingPose,
                         1); // Get first movement trajectory
-                FollowTrajectory tag_7_movement1 = new FollowTrajectory(
+                FollowTrajectoryOdometry tag_7_movement1 = new FollowTrajectoryOdometry(
                         container.m_robotDrive,
                         tag_7_traj1,
                         startingPose.getRotation(),
@@ -319,7 +319,7 @@ public class AutonUtils {
                         startingPose,
                         2); // Get second movement trajectory
 
-                FollowTrajectory tag_7_movement2 = new FollowTrajectory(
+                FollowTrajectoryOdometry tag_7_movement2 = new FollowTrajectoryOdometry(
                         container.m_robotDrive,
                         tag_7_traj2,
                         startingPose.getRotation(),
@@ -357,7 +357,7 @@ public class AutonUtils {
                     script,
                     startingPose,
                     1); // Get first movement trajectory
-            FollowTrajectory tag_6_movement1 = new FollowTrajectory(
+            FollowTrajectoryOdometry tag_6_movement1 = new FollowTrajectoryOdometry(
                     container.m_robotDrive,
                     tag_6_traj1,
                     startingPose.getRotation(),
@@ -403,7 +403,7 @@ public class AutonUtils {
                     script,
                     startingPose,
                     1); // Get first movement trajectory
-            FollowTrajectory tag_1_movement1 = new FollowTrajectory(
+            FollowTrajectoryOdometry tag_1_movement1 = new FollowTrajectoryOdometry(
                     container.m_robotDrive,
                     tag_1_traj1,
                     startingPose.getRotation(),
@@ -455,7 +455,7 @@ public class AutonUtils {
                     script,
                     startingPose,
                     1); // Get first movement trajectory
-            FollowTrajectory tag_2_movement1 = new FollowTrajectory(
+            FollowTrajectoryOdometry tag_2_movement1 = new FollowTrajectoryOdometry(
                     container.m_robotDrive,
                     tag_2_traj1,
                     startingPose.getRotation(),
@@ -471,7 +471,7 @@ public class AutonUtils {
                     startingPose,
                     2); // Get second movement trajectory
 
-            FollowTrajectory tag_2_movement2 = new FollowTrajectory(
+            FollowTrajectoryOdometry tag_2_movement2 = new FollowTrajectoryOdometry(
                     container.m_robotDrive,
                     tag_2_traj2,
                     startingPose.getRotation(),
@@ -508,7 +508,7 @@ public class AutonUtils {
                     script,
                     startingPose,
                     1); // Get first movement trajectory
-            FollowTrajectory tag_3_movement1 = new FollowTrajectory(
+            FollowTrajectoryOdometry tag_3_movement1 = new FollowTrajectoryOdometry(
                     container.m_robotDrive,
                     tag_3_traj1,
                     startingPose.getRotation(),
@@ -553,7 +553,8 @@ public class AutonUtils {
     }
 
     public static enum Script {
-        SCORE_AND_CHARGE,
+        SCORE_AND_CHARGE_LONG,
+        SCORE_AND_CHARGE_SHORT,
         TAG_8_BLUE,
         TAG_7_BLUE,
         TAG_6_BLUE,
