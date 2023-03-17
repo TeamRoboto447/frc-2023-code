@@ -36,14 +36,13 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
     PortForwarder.add(5800, "photonvision.local", 5800);
     
-    m_chooser.setDefaultOption("Score and Charge (Dead Reckoning 15ft)", Script.SCORE_AND_CHARGE_LONG);
-    m_chooser.addOption("Score and Charge (Dead Reckoning 9.5ft)", Script.SCORE_AND_CHARGE_LONG);
-    m_chooser.addOption(Script.TAG_1_RED.name(), Script.TAG_1_RED);
-    m_chooser.addOption(Script.TAG_2_RED.name(), Script.TAG_2_RED);
-    m_chooser.addOption(Script.TAG_3_RED.name(), Script.TAG_3_RED);
-    m_chooser.addOption(Script.TAG_6_BLUE.name(), Script.TAG_6_BLUE);
-    m_chooser.addOption(Script.TAG_7_BLUE.name(), Script.TAG_7_BLUE);
-    m_chooser.addOption(Script.TAG_8_BLUE.name(), Script.TAG_8_BLUE);
+    m_chooser.setDefaultOption("Score only", Script.TAG_3_RED);
+   // m_chooser.addOption("Score and Charge (Dead Reckoning 9.5ft)", Script.SCORE_AND_CHARGE_SHORT);
+    m_chooser.addOption("Score Drive Short", Script.TAG_1_RED);
+    m_chooser.addOption("Score Drive Long", Script.TAG_2_RED);
+      // m_chooser.addOption(Script.TAG_6_BLUE.name(), Script.TAG_6_BLUE);
+   // m_chooser.addOption(Script.TAG_7_BLUE.name(), Script.TAG_7_BLUE);
+   // m_chooser.addOption(Script.TAG_8_BLUE.name(), Script.TAG_8_BLUE);
 
     SmartDashboard.putData(m_chooser);
   }

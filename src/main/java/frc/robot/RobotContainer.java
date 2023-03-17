@@ -217,8 +217,10 @@ public class RobotContainer {
                 new MoveArmToLimit(m_robotArm, Limit.BOTTOM_VERTICAL, Limit.NO_CHANGE, -1),
                 new SetGrabber(m_robotArm, false),
                 new MoveArmToLimit(m_robotArm, Limit.NO_CHANGE, Limit.NO_CHANGE, -1),
-                new MoveArmToLimit(m_robotArm, Limit.NO_CHANGE, Limit.NO_CHANGE, 0)),
-            new WaitForInput(this::shouldAbortCommand)));
+                // new MoveArmToLimit(m_robotArm, Limit.NO_CHANGE, Limit.NO_CHANGE, 0),
+                new MoveArmToPosition(m_robotArm, 75, Double.NaN, -1),
+                new MoveArmToPosition(m_robotArm, Double.NaN, 0, 0),
+            new WaitForInput(this::shouldAbortCommand))));
 
    // xButton.onTrue(
    //     new ParallelRaceGroup(

@@ -71,12 +71,12 @@ public class MoveArmToLimit extends CommandBase {
   }
 
   private void stopVert() {
-    this.armSubsystem.goToVertical(this.armSubsystem.getVertEncoder());
+ //   this.armSubsystem.goToVertical(this.armSubsystem.getVertEncoder());
     this.armSubsystem.rawMoveVertical(0);
   }
 
   private void stopHoriz() {
-    this.armSubsystem.goToHorizontal(this.armSubsystem.getHorizontalEncoder());
+//this.armSubsystem.goToHorizontal(this.armSubsystem.getHorizontalEncoder());
     this.armSubsystem.rawMoveHorizontal(0);
   }
 

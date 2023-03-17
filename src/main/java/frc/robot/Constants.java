@@ -118,7 +118,7 @@ public final class Constants {
     public static final double vertBangBangSpeed = 0.75;    // Vert Arm Speed
     public static final double horizBangBangSpeed = 0.75;   // Horz Arm Speed
 
-    public static final double horizontalPIDTolerance = 0.1;
+    public static final double horizontalPIDTolerance = 1;
     public static final double verticalPIDTolerance = 0.1;
     public static final double intakePIDTolerance = 0.1;
   }

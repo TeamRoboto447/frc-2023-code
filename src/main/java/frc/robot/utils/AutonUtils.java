@@ -61,7 +61,7 @@ public class AutonUtils {
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(0), Units.feetToMeters(15), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(0), Units.feetToMeters(13.5), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
             default:
                 return null;
@@ -74,7 +74,7 @@ public class AutonUtils {
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(0), Units.feetToMeters(9.5), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(0), Units.feetToMeters(8.5), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
             default:
                 return null;
@@ -87,7 +87,7 @@ public class AutonUtils {
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(33), Units.feetToMeters(8), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(0), Units.feetToMeters(8.5), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
                 default:
                 return null;
@@ -100,14 +100,14 @@ public class AutonUtils {
                     return TrajectoryGenerator.generateTrajectory(
                             startingPose,
                             List.of(),
-                            new Pose2d(Units.feetToMeters(36.6), Units.feetToMeters(10), startingPose.getRotation()),
+                            new Pose2d(Units.feetToMeters(0), Units.feetToMeters(13.5), startingPose.getRotation()),
                             AutoConstants.trajectoryConfig);
-                case 2:
-                    return TrajectoryGenerator.generateTrajectory(
-                            startingPose,
-                            List.of(),
-                            new Pose2d(Units.feetToMeters(42.1), Units.feetToMeters(10), startingPose.getRotation()),
-                            AutoConstants.trajectoryConfig);
+        //        case 2:
+        //            return TrajectoryGenerator.generateTrajectory(
+         //                   startingPose,
+        //                    List.of(),
+        //                    new Pose2d(Units.feetToMeters(42.1), Units.feetToMeters(10), startingPose.getRotation()),
+        //                    AutoConstants.trajectoryConfig);
     
                 default:
                 return null;
@@ -403,7 +403,7 @@ public class AutonUtils {
                     script,
                     startingPose,
                     1); // Get first movement trajectory
-            FollowTrajectoryOdometry tag_1_movement1 = new FollowTrajectoryOdometry(
+            FollowTrajectoryDeadReckoning tag_1_movement1 = new FollowTrajectoryDeadReckoning(
                     container.m_robotDrive,
                     tag_1_traj1,
                     startingPose.getRotation(),
@@ -447,35 +447,35 @@ public class AutonUtils {
 
                     tag_1_movement1, // Do First Movement
                    // tag_1_movement2, // Do second Movement
-                    new InstantCommand(
-                            () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped;
+                   new LockRobot(container.m_robotArm, container.m_robotDrive)); // Ensure Robot Is Stopped;
+                   
             case TAG_2_RED:
             startingPose = container.m_robotDrive.getPose(); // Setup starting pose
             Trajectory tag_2_traj1 = AutonUtils.getTrajectory(
                     script,
                     startingPose,
                     1); // Get first movement trajectory
-            FollowTrajectoryOdometry tag_2_movement1 = new FollowTrajectoryOdometry(
+            FollowTrajectoryDeadReckoning tag_2_movement1 = new FollowTrajectoryDeadReckoning(
                     container.m_robotDrive,
                     tag_2_traj1,
                     startingPose.getRotation(),
-                    false); // Create a new movement command for the first movement
+                    true); // Create a new movement command for the first movement
 
-            startingPose = new Pose2d(
-                    Units.feetToMeters(38.6),
-                    Units.feetToMeters(10),
-                    startingPose.getRotation()); // Update starting pose for next movement
+     //       startingPose = new Pose2d(
+     //               Units.feetToMeters(38.6),
+     //               Units.feetToMeters(10),
+     //               startingPose.getRotation()); // Update starting pose for next movement
 
-            Trajectory tag_2_traj2 = AutonUtils.getTrajectory(
-                    script,
-                    startingPose,
-                    2); // Get second movement trajectory
+     //       Trajectory tag_2_traj2 = AutonUtils.getTrajectory(
+     //               script,
+     //               startingPose,
+     //               2); // Get second movement trajectory
 
-            FollowTrajectoryOdometry tag_2_movement2 = new FollowTrajectoryOdometry(
-                    container.m_robotDrive,
-                    tag_2_traj2,
-                    startingPose.getRotation(),
-                    true); // Create a new movement command for the second movement
+     //       FollowTrajectoryOdometry tag_2_movement2 = new FollowTrajectoryOdometry(
+     //               container.m_robotDrive,
+     //               tag_2_traj2,
+     //               startingPose.getRotation(),
+     //               true); // Create a new movement command for the second movement
 
             return new SequentialCommandGroup( // This runs the movements in order
                     new InstantCommand(
@@ -498,10 +498,10 @@ public class AutonUtils {
                     // NaN = don't move
 
                     tag_2_movement1, // Do First Movement
-                    tag_2_movement2, // Do second Movement
-                    new InstantCommand(
-                            () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped;
-            case TAG_3_RED:
+        //            tag_2_movement2, // Do second Movement
+                    new LockRobot(container.m_robotArm, container.m_robotDrive)); // Ensure Robot Is Stopped;
+            
+                    case TAG_3_RED:
             
             startingPose = container.m_robotDrive.getPose(); // Setup starting pose
             Trajectory tag_3_traj1 = AutonUtils.getTrajectory(
@@ -543,7 +543,7 @@ public class AutonUtils {
                     new SetGrabberExtensionWithIntake(container.m_robotArm, true, 1),
                     new SetGrabberExtension(container.m_robotArm, true),
                     
-                    tag_3_movement1, // Do First Movement
+                   // tag_3_movement1, // Do First Movement
                    // tag_3_movement2, // Do second Movement
                     new InstantCommand(
                             () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped;
