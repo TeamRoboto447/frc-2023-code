@@ -66,7 +66,7 @@ public final class Constants {
 
     public static final double kMaxSpeedMetersPerSecond = 30;
 
-    public static final double angleOffset = 90;
+    public static final double angleOffset = -90;
   }
 
   public static class ModuleConstants {
@@ -115,8 +115,8 @@ public final class Constants {
     public static final double horizontalRange = 63.86;
     public static final double horizontalStart = -9.6;
 
-    public static final double vertBangBangSpeed = 0.75;    // Vert Arm Speed
-    public static final double horizBangBangSpeed = 0.75;   // Horz Arm Speed
+    public static final double vertBangBangSpeed = 0.90;    // Vert Arm Speed
+    public static final double horizBangBangSpeed = 0.90;   // Horz Arm Speed
 
     public static final double horizontalPIDTolerance = 1;
     public static final double verticalPIDTolerance = 0.1;

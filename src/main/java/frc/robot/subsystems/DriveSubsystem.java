@@ -19,6 +19,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 
@@ -84,6 +85,10 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+
+    SmartDashboard.putNumber("Pitch", getPitch());
+    SmartDashboard.putNumber("Pitch", getPitch());
+
     // Update the odometry in the periodic block
     update(
         new SwerveModulePosition[] {
@@ -203,5 +208,12 @@ public class DriveSubsystem extends SubsystemBase {
     m_frontRight.stop();
     m_rearLeft.stop();
     m_rearRight.stop();
+  }
+
+  public double getPitch() {
+   return m_gyro.getPitch();
+  }
+  public double getRoll() {
+   return m_gyro.getRoll();
   }
 }

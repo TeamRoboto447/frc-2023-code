@@ -40,6 +40,7 @@ public class Robot extends TimedRobot {
    // m_chooser.addOption("Score and Charge (Dead Reckoning 9.5ft)", Script.SCORE_AND_CHARGE_SHORT);
     m_chooser.addOption("Score Drive Short", Script.TAG_1_RED);
     m_chooser.addOption("Score Drive Long", Script.TAG_2_RED);
+    m_chooser.addOption("Balance", Script.BALANCE);
       // m_chooser.addOption(Script.TAG_6_BLUE.name(), Script.TAG_6_BLUE);
    // m_chooser.addOption(Script.TAG_7_BLUE.name(), Script.TAG_7_BLUE);
    // m_chooser.addOption(Script.TAG_8_BLUE.name(), Script.TAG_8_BLUE);

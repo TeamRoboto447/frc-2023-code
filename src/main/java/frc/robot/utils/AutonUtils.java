@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.commands.AutoBalance;
 import frc.robot.commands.FollowTrajectoryDeadReckoning;
 import frc.robot.commands.FollowTrajectoryOdometry;
 import frc.robot.commands.LockRobot;
@@ -87,7 +88,7 @@ public class AutonUtils {
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(0), Units.feetToMeters(8.5), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(0), Units.feetToMeters(10.5), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
                 default:
                 return null;
@@ -547,6 +548,8 @@ public class AutonUtils {
                    // tag_3_movement2, // Do second Movement
                     new InstantCommand(
                             () -> container.m_robotDrive.stopModules())); // Ensure Robot Is Stopped;
+            case BALANCE:
+                return new AutoBalance(container.m_robotDrive);    
             default:
                 return new SequentialCommandGroup();
         }
@@ -560,6 +563,7 @@ public class AutonUtils {
         TAG_6_BLUE,
         TAG_1_RED,
         TAG_2_RED,
-        TAG_3_RED
+        TAG_3_RED,
+        BALANCE
     }
 }
