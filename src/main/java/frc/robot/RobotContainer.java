@@ -204,6 +204,7 @@ public class RobotContainer {
                 //new MoveArmToPosition(m_robotArm, Double.NaN, Double.NaN, -0.2),
                 //new MoveArmToPosition(m_robotArm, 111, Double.NaN, 0),
                 new MoveArmToLimit(m_robotArm, Limit.NO_CHANGE, Limit.CLOSE_HORIZONTAL, 0)),
+                
                 //new MoveArmToLimit(m_robotArm, Limit.NO_CHANGE, Limit.CLOSE_HORIZONTAL, 0),
                 //new MoveArmToLimit(m_robotArm, Limit.NO_CHANGE, Limit.NO_CHANGE, 0)),
                 //new MoveArmToPosition(m_robotArm, Double.NaN, 0, 0)),
