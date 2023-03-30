@@ -11,11 +11,21 @@ public class SetGrabberExtension extends CommandBase {
   private final ArmSubsystem armSubsystem;
   private final boolean extend;
   private final Timer delay = new Timer();
+  private final double waitTime;
   /** Creates a new SetGrabber. */
+  public SetGrabberExtension(ArmSubsystem armSubsystem, boolean extend, double delayBeforeMovingOn) {
+    // Use addRequirements() here to declare subsystem dependencies.
+    this.armSubsystem = armSubsystem;
+    this.extend = extend;
+    this.waitTime = delayBeforeMovingOn;
+    addRequirements(armSubsystem);
+  }
+
   public SetGrabberExtension(ArmSubsystem armSubsystem, boolean extend) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.armSubsystem = armSubsystem;
     this.extend = extend;
+    this.waitTime = 1;
     addRequirements(armSubsystem);
   }
 
@@ -31,10 +41,11 @@ public class SetGrabberExtension extends CommandBase {
     if(this.extend) this.armSubsystem.extend();
     else this.armSubsystem.retract();
     this.armSubsystem.holdAll();
+    System.out.println("Set Extension: " + this.extend);
   }
 
   @Override
   public boolean isFinished() {
-    return this.delay.get() > 2;
+    return this.delay.get() > this.waitTime;
   }
 }

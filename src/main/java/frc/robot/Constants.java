@@ -111,15 +111,14 @@ public final class Constants {
     public static final double kIArmIntakeController = 0;
     public static final double kDArmIntakeController = 0;
 
-    public static final double verticalRange = 43.7;
-    public static final double horizontalRange = 63.86;
-    public static final double horizontalStart = -9.6;
+    public static final double verticalRange = 200; // Encoder position gets reset when the vertical motor hits the high limit
+    public static final double horizontalRange = 230; // Encoder position gets reset when the horizontal motor hits the far limit
 
-    public static final double vertBangBangSpeed = 0.90;    // Vert Arm Speed
-    public static final double horizBangBangSpeed = 0.90;   // Horz Arm Speed
+    public static final double vertBangBangSpeed = 0.75;    // Vert Arm Speed
+    public static final double horizBangBangSpeed = 0.75;   // Horz Arm Speed
 
-    public static final double horizontalPIDTolerance = 1;
-    public static final double verticalPIDTolerance = 0.1;
+    public static final double horizontalPIDTolerance = 5;
+    public static final double verticalPIDTolerance = 5;
     public static final double intakePIDTolerance = 0.1;
   }
 
@@ -158,5 +157,9 @@ public final class Constants {
         new Rotation3d(0, 0, 0));
         
     public static final String cameraName = "PSI_Cam";
+  }
+
+  public static class TeamSpecificConstants {
+    public static final boolean is447Robot = true;
   }
 }

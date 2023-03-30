@@ -6,10 +6,13 @@ package frc.robot;
 
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.TeamSpecificConstants;
 import frc.robot.commands.MoveArmToLimit;
 import frc.robot.commands.MoveArmToPosition;
+import frc.robot.commands.CloseGrabberForTravel;
 import frc.robot.commands.SetGrabber;
 import frc.robot.commands.SetGrabberExtension;
+import frc.robot.commands.SetGrabberExtensionWithIntake;
 import frc.robot.commands.SetGrabberWithIntake;
 import frc.robot.commands.WaitForInput;
 import frc.robot.commands.MoveArmToLimit.Limit;
@@ -19,6 +22,8 @@ import frc.robot.utils.Toggle;
 import frc.robot.utils.AutonUtils.Script;
 import frc.robot.subsystems.ArmSubsystem;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -27,10 +32,12 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -50,10 +57,12 @@ public class RobotContainer {
 
   Joystick m_driverController = new Joystick(OIConstants.kDriverControllerPort);
   JoystickControl m_joystickControl = new JoystickControl(m_driverController, 0.25, 0.25, -10, -0.333);
+  POVToAxis m_joystickPOVAxis = new POVToAxis(() -> m_driverController.getPOV(), -2.5, 2.5, -2.5, 2.5);
 
   XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
-  POVToAxis m_operatorPOVAxis = new POVToAxis(m_operatorController, -0.75, 0.75, -0.75, 0.75); // controller, xMin,
-                                                                                               // xMax, yMin, yMax
+  POVToAxis m_operatorPOVAxis = new POVToAxis(() -> m_operatorController.getPOV(), -0.95, 0.95, -0.95, 0.95); // controller,
+                                                                                                              // xMin,
+  // xMax, yMin, yMax
 
   Toggle leftBumperToggle = new Toggle(false);
   Toggle rightBumperToggle = new Toggle(false);
@@ -68,14 +77,14 @@ public class RobotContainer {
 
           if (m_driverController.getRawButton(5)) {
             m_robotDrive.drive(
-                -2.5,
+                -2.5 * (TeamSpecificConstants.is447Robot ? 1 : -1),
                 0,
                 0,
                 true);
 
           } else if (m_driverController.getRawButton(6)) {
             m_robotDrive.drive(
-                2.5,
+                2.5 * (TeamSpecificConstants.is447Robot ? 1 : -1),
                 0,
                 0,
                 true);
@@ -95,6 +104,14 @@ public class RobotContainer {
                 m_joystickControl.getY(),
                 -0.1,
                 true);
+          } else if (m_joystickPOVAxis.inUse()) {
+
+            m_robotDrive.drive(
+                m_joystickPOVAxis.getY() * (TeamSpecificConstants.is447Robot ? -1 : 1),
+                -m_joystickPOVAxis.getX() * (TeamSpecificConstants.is447Robot ? -1 : 1),
+                0,
+                true);
+
           } else {
 
             m_joystickControl.setEnableXYControl(enableXY());
@@ -163,6 +180,7 @@ public class RobotContainer {
     SmartDashboard.putNumber("Processing Y Coord", Units.metersToFeet(m_robotDrive.getPose().getY()));
 
     SmartDashboard.putNumber("Gyro Angle", m_robotDrive.getHeading());
+    SmartDashboard.putNumber("Gyro Roll", m_robotDrive.getRoll() * (TeamSpecificConstants.is447Robot ? -1 : 1));
 
     SmartDashboard.putNumber("Vertical Arm Encoder", m_robotArm.getVertEncoder());
     SmartDashboard.putNumber("Horizontal Arm Encoder", m_robotArm.getHorizontalEncoder());
@@ -199,50 +217,62 @@ public class RobotContainer {
     aButton.onTrue(
         new ParallelRaceGroup(
             new SequentialCommandGroup(
-                new SetGrabberWithIntake(m_robotArm, false, 0),
-                new SetGrabberExtension(m_robotArm, false),
-                //new MoveArmToPosition(m_robotArm, Double.NaN, Double.NaN, -0.2),
-                //new MoveArmToPosition(m_robotArm, 111, Double.NaN, 0),
-                new MoveArmToLimit(m_robotArm, Limit.NO_CHANGE, Limit.CLOSE_HORIZONTAL, 0)),
-                
-                //new MoveArmToLimit(m_robotArm, Limit.NO_CHANGE, Limit.CLOSE_HORIZONTAL, 0),
-                //new MoveArmToLimit(m_robotArm, Limit.NO_CHANGE, Limit.NO_CHANGE, 0)),
-                //new MoveArmToPosition(m_robotArm, Double.NaN, 0, 0)),
+                new MoveArmToLimit(m_robotArm, Limit.NO_CHANGE, Limit.CLOSE_HORIZONTAL, 0),
+                new CloseGrabberForTravel(m_robotArm),
+                new MoveArmToPosition(m_robotArm, 100, 0, 0),
+                new InstantCommand(() -> {
+                  leftBumperToggle.setState(false);
+                  rightBumperToggle.setState(false);
+                })),
             new WaitForInput(this::shouldAbortCommand)));
 
-    //bButton.onTrue(
-    //    new ParallelRaceGroup(
-    //        new SequentialCommandGroup(
-    //            new SetGrabberExtension(m_robotArm, false),
-    //            new MoveArmToPosition(m_robotArm, Double.NaN, 116, 0),
-    //            new SetGrabber(m_robotArm, true),
-    //            new MoveArmToLimit(m_robotArm, Limit.BOTTOM_VERTICAL, Limit.NO_CHANGE, -1),
-    //            new SetGrabber(m_robotArm, false),
-    //            new MoveArmToLimit(m_robotArm, Limit.NO_CHANGE, Limit.NO_CHANGE, -1),
-    //            // new MoveArmToLimit(m_robotArm, Limit.NO_CHANGE, Limit.NO_CHANGE, 0),
-    //            new MoveArmToPosition(m_robotArm, 75, Double.NaN, -1),
-    //            new MoveArmToPosition(m_robotArm, Double.NaN, 0, 0),
-    //        new WaitForInput(this::shouldAbortCommand))));
-
-    xButton.onTrue(
+    bButton.onTrue(
         new ParallelRaceGroup(
             new SequentialCommandGroup(
-                new SetGrabberExtension(m_robotArm, true),
-                new MoveArmToLimit(m_robotArm, Limit.TOP_VERTICAL, Limit.NO_CHANGE, 0),
-   //             new WaitForInput(() -> m_operatorController.getRightBumper()),
-   //             new MoveArmToPosition(m_robotArm, 0, 0, 0)),
-            new WaitForInput(this::shouldAbortCommand))));
+                new MoveArmToPosition(m_robotArm, 100, 100, -0.25),
+                new SetGrabberWithIntake(m_robotArm, true, -0.5),
+                new MoveArmToLimit(m_robotArm, Limit.BOTTOM_VERTICAL, Limit.NO_CHANGE, -0.5),
+                new SetGrabberWithIntake(m_robotArm, false, -0.5),
+                new WaitCommand(0.5),
+                new MoveArmToPosition(m_robotArm, 100, 100, -0.25),
+                new MoveArmToLimit(m_robotArm, Limit.NO_CHANGE, Limit.CLOSE_HORIZONTAL, 0),
+                new InstantCommand(() -> {
+                  leftBumperToggle.setState(false);
+                  rightBumperToggle.setState(false);
+                })),
+            new WaitForInput(this::shouldAbortCommand)));
 
-    //yButton.onTrue(
-    //    new ParallelRaceGroup(new SequentialCommandGroup(
-    //        new SetGrabberExtension(m_robotArm, true),
-   //         new WaitForInput(() -> m_operatorController.getRightBumper()),
-   //         new MoveArmToPosition(m_robotArm, 0, 0, 0)),
-   //         new WaitForInput(this::shouldAbortCommand);
+    xButton.onTrue(
+      new ParallelRaceGroup(
+        new SequentialCommandGroup(
+          new CloseGrabberForTravel(m_robotArm),
+          new MoveArmToPosition(m_robotArm, 155, 102, 0),
+          new InstantCommand(() -> {
+            leftBumperToggle.setState(true);
+            rightBumperToggle.setState(true);
+          }
+        )),
+        new WaitForInput(this::shouldAbortCommand)
+      ));
+
+    yButton.onTrue(
+      new ParallelRaceGroup(
+        new SequentialCommandGroup(
+          new SetGrabberExtension(m_robotArm, true),
+          new MoveArmToLimit(m_robotArm, Limit.TOP_VERTICAL, Limit.NO_CHANGE, 0),
+          new MoveArmToLimit(m_robotArm, Limit.NO_CHANGE, Limit.FAR_HORIZONTAL, 0),
+          new InstantCommand(() -> {
+            leftBumperToggle.setState(true);
+          })
+        ),
+        new WaitForInput(this::shouldAbortCommand)
+      )
+    );
   }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
+   * 
    * @param script
    *
    * @return the command to run in autonomous
@@ -253,7 +283,7 @@ public class RobotContainer {
         new RunCommand(() -> updateSmartdashboard()), // This just runs a command that never ends and just updates the
                                                       // dashboard during auto
         AutonUtils.getCommandScript(this, script)); // This gets the autonomous script
-                                                                               // (usually a sequential command group)
+                                                    // (usually a sequential command group)
   }
 
   protected double deadzone(double val, double deadzone) {
@@ -264,22 +294,27 @@ public class RobotContainer {
   }
 
   private class POVToAxis {
-    private final XboxController joystick;
+    private final Supplier<Integer> pov;
     private final double xMin;
     private final double xMax;
     private final double yMin;
     private final double yMax;
 
-    public POVToAxis(XboxController joystick, double xMin, double xMax, double yMin, double yMax) {
-      this.joystick = joystick;
+    public POVToAxis(Supplier<Integer> getPOV, double xMin, double xMax, double yMin, double yMax) {
+      this.pov = getPOV;
       this.xMin = xMin;
       this.xMax = xMax;
       this.yMin = yMin;
       this.yMax = yMax;
     }
 
+    public boolean inUse() {
+      return this.pov.get() != -1;
+    }
+
     public double getX() {
-      double pov = this.joystick.getPOV();
+      double pov = this.pov.get();
+      SmartDashboard.putNumber("Operator POV", pov);
       if (pov == 315 || pov == 0 || pov == 45)
         return this.yMax;
       if (pov == 135 || pov == 180 || pov == 225)
@@ -288,7 +323,7 @@ public class RobotContainer {
     }
 
     public double getY() {
-      double pov = this.joystick.getPOV();
+      double pov = this.pov.get();
       if (pov == 45 || pov == 90 || pov == 135)
         return this.xMin;
       if (pov == 225 || pov == 270 || pov == 315)
@@ -316,15 +351,24 @@ public class RobotContainer {
     }
 
     public double getX() {
-      return this.enableXY ? (deadzone(-this.joystick.getX(), this.deadzoneXY) * this.multiplierXY) : 0;
+      return this.enableXY
+          ? (deadzone(-this.joystick.getX(), this.deadzoneXY) * this.multiplierXY)
+              * (TeamSpecificConstants.is447Robot ? 1 : -1)
+          : 0;
     }
 
     public double getY() {
-      return this.enableXY ? (deadzone(this.joystick.getY(), this.deadzoneXY) * this.multiplierXY) : 0;
+      return this.enableXY
+          ? (deadzone(this.joystick.getY(), this.deadzoneXY) * this.multiplierXY)
+              * (TeamSpecificConstants.is447Robot ? 1 : -1)
+          : 0;
     }
 
     public double getROT() {
-      return this.enableROT ? -(deadzone(this.joystick.getZ(), this.deadzoneROT) * this.multiplierROT) : 0;
+      return this.enableROT
+          /* || TeamSpecificConstants.is447Robot */ ? -(deadzone(this.joystick.getZ(), this.deadzoneROT)
+              * this.multiplierROT) * (TeamSpecificConstants.is447Robot ? 1 : -1)
+          : 0;
     }
 
     public void setEnableXYControl(boolean enabled) {

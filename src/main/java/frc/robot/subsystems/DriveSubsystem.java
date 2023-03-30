@@ -87,7 +87,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void periodic() {
 
     SmartDashboard.putNumber("Pitch", getPitch());
-    SmartDashboard.putNumber("Pitch", getPitch());
+    SmartDashboard.putNumber("Roll", getRoll());
 
     // Update the odometry in the periodic block
     update(
@@ -149,6 +149,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+    
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())

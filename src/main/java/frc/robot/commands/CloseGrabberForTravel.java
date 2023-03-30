@@ -7,25 +7,13 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ArmSubsystem;
 import edu.wpi.first.wpilibj.Timer;
 
-public class SetGrabber extends CommandBase {
+public class CloseGrabberForTravel extends CommandBase {
   private final ArmSubsystem armSubsystem;
-  private final boolean open;
   private final Timer delay = new Timer();
-  private final double waitTime;
   /** Creates a new SetGrabber. */
-  public SetGrabber(ArmSubsystem armSubsystem, boolean open, double delayBeforeStop) {
+  public CloseGrabberForTravel(ArmSubsystem armSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.armSubsystem = armSubsystem;
-    this.open = open;
-    this.waitTime = delayBeforeStop;
-    addRequirements(armSubsystem);
-  }
-
-  public SetGrabber(ArmSubsystem armSubsystem, boolean open) {
-    // Use addRequirements() here to declare subsystem dependencies.
-    this.armSubsystem = armSubsystem;
-    this.open = open;
-    this.waitTime = 1;
     addRequirements(armSubsystem);
   }
 
@@ -38,13 +26,13 @@ public class SetGrabber extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(this.open) this.armSubsystem.open();
-    else this.armSubsystem.close();
+    this.armSubsystem.close();
+    this.armSubsystem.retract();
     this.armSubsystem.holdAll();
   }
 
   @Override
   public boolean isFinished() {
-    return this.delay.get() > waitTime;
+    return true;
   }
 }

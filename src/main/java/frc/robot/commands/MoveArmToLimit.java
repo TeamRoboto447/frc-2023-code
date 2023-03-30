@@ -31,7 +31,7 @@ public class MoveArmToLimit extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    this.armSubsystem.setMaxArmSpeeds(0.75);
+    this.armSubsystem.setMaxArmSpeeds(1);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

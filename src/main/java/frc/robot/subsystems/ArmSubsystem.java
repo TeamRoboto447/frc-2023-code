@@ -28,7 +28,7 @@ public class ArmSubsystem extends SubsystemBase {
     private final double speedScaleFactor = 1.2;
     private final double intakespeedScaleFactor = 0.2;
 
-    private double lastVertTeleopPos = 0;
+    private double lastVertTeleopPos = 100;
 
     private double maxPIDOutput = 1;
     private double currentHeightTarget = 0;
@@ -80,7 +80,9 @@ public class ArmSubsystem extends SubsystemBase {
         this.openCloseSolenoid.set(this.grabberState);
         this.extensionRetractionSolenoid.set(this.extensionState);
         if(this.atVerticalLowLimit()) this.verticalMotor.getEncoder().setPosition(0);
+        if(this.atVerticalHighLimit()) this.verticalMotor.getEncoder().setPosition(ArmConstants.verticalRange);
         if(this.atHorizontalLowLimit()) this.horizontalMotor.getEncoder().setPosition(0);
+        if(this.atHorizontalHighLimit()) this.horizontalMotor.getEncoder().setPosition(ArmConstants.horizontalRange);
     }
 
     public void setDistTarget(double target) {

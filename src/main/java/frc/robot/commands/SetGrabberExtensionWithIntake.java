@@ -12,12 +12,23 @@ public class SetGrabberExtensionWithIntake extends CommandBase {
   private final boolean extend;
   private final double intakeSpeed;
   private final Timer delay = new Timer();
+  private final double waitTime;
+
+  public SetGrabberExtensionWithIntake(ArmSubsystem armSubsystem, boolean extend, double intakeSpeed, double delayBeforeStop) {
+    // Use addRequirements() here to declare subsystem dependencies.
+    this.armSubsystem = armSubsystem;
+    this.extend = extend;
+    this.intakeSpeed = intakeSpeed;
+    this.waitTime = delayBeforeStop;
+    addRequirements(armSubsystem);
+  }
 
   public SetGrabberExtensionWithIntake(ArmSubsystem armSubsystem, boolean extend, double intakeSpeed) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.armSubsystem = armSubsystem;
     this.extend = extend;
     this.intakeSpeed = intakeSpeed;
+    this.waitTime = 1;
     addRequirements(armSubsystem);
   }
 
