@@ -59,7 +59,7 @@ public class MoveArmToLimit extends CommandBase {
   }
 
   private boolean runVert(double speed) {
-    this.armSubsystem.rawMoveVertical(speed);
+    this.armSubsystem.teleopMoveVertical(speed);
     this.armSubsystem.setVertTarget(this.armSubsystem.getVertEncoder());
     return speed > 0 ? this.armSubsystem.atVerticalHighLimit() : this.armSubsystem.atVerticalLowLimit();
   }

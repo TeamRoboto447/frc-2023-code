@@ -29,7 +29,7 @@ public class autoBalance {
          * CONFIG *
          **********/
         // Speed the robot drived while scoring/approaching station, default = 0.4
-        robotSpeedFast = TeamSpecificConstants.is447Robot ? 6 : -7;
+        robotSpeedFast = TeamSpecificConstants.is447Robot ? 5.5 : -7;
 
         // Speed the robot drives while balancing itself on the charge station.
         // Should be roughly half the fast speed, to make the robot more accurate,
@@ -45,7 +45,7 @@ public class autoBalance {
         // Angle where the robot can assume it is level on the charging station
         // Used for exiting the drive forward sequence as well as for auto balancing,
         // default = 6.0
-        levelDegree = TeamSpecificConstants.is447Robot ? 4.75 : 5.5;
+        levelDegree = TeamSpecificConstants.is447Robot ? 5 : 5.5;
 
         // Amount of time a sensor condition needs to be met before changing this.states in
         // seconds

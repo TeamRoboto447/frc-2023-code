@@ -160,6 +160,6 @@ public final class Constants {
   }
 
   public static class TeamSpecificConstants {
-    public static final boolean is447Robot = true;
+    public static final boolean is447Robot = false;
   }
 }

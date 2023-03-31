@@ -15,19 +15,20 @@ public class AutoBalance extends CommandBase {
     public AutoBalance(DriveSubsystem drivetrain, ArmSubsystem arm) {
         this.drivetrain = drivetrain;
         this.arm = arm;
-        this.movement = new RollingAverage(5);
+        // this.movement = new RollingAverage(2);
         autoBalance = new autoBalance(drivetrain);
     }
 
     @Override
     public void execute() {
         double requestedMovement = autoBalance.autoBalanceRoutine();
-        movement.add(requestedMovement);
-        drivetrain.drive(0, movement.getAverage(), 0, true);
-        if(movement.getAverage() == 0) drivetrain.hold();
+        // movement.add(requestedMovement);
+        drivetrain.drive(0, requestedMovement, 0, true);
+        if(requestedMovement == 0) drivetrain.hold();
         else drivetrain.allowMovement();
-        arm.goToVertical(130);
+        arm.goToVertical(70);
         arm.goToHorizontal(0);
+
     }
 
     @Override
