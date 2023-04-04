@@ -88,7 +88,7 @@ public class RobotContainer {
                 0,
                 0,
                 true);
-          } else if (m_driverController.getRawButton(3)) {
+          } else if (m_driverController.getRawButton(4)) {
             m_joystickControl.setEnableXYControl(enableXY());
 
             m_robotDrive.drive(
@@ -96,7 +96,7 @@ public class RobotContainer {
                 m_joystickControl.getY(),
                 0.1,
                 true);
-          } else if (m_driverController.getRawButton(4)) {
+          } else if (m_driverController.getRawButton(3)) {
             m_joystickControl.setEnableXYControl(enableXY());
 
             m_robotDrive.drive(
@@ -229,7 +229,7 @@ public class RobotContainer {
     bButton.onTrue(
         new ParallelRaceGroup(
             new SequentialCommandGroup(
-                new MoveArmToPosition(m_robotArm, 100, 100, -0.25),
+                new MoveArmToPosition(m_robotArm, 100, 88, -0.25),
                 new SetGrabberWithIntake(m_robotArm, true, -0.5),
                 new MoveArmToLimit(m_robotArm, Limit.BOTTOM_VERTICAL, Limit.NO_CHANGE, -0.5),
                 new SetGrabberWithIntake(m_robotArm, false, -0.5),
@@ -258,6 +258,7 @@ public class RobotContainer {
     yButton.onTrue(
       new ParallelRaceGroup(
         new SequentialCommandGroup(
+          new MoveArmToLimit(m_robotArm, Limit.NO_CHANGE, Limit.NO_CHANGE, -1),
           new SetGrabberExtension(m_robotArm, true),
           new MoveArmToLimit(m_robotArm, Limit.TOP_VERTICAL, Limit.NO_CHANGE, 0),
           new MoveArmToLimit(m_robotArm, Limit.NO_CHANGE, Limit.FAR_HORIZONTAL, 0),

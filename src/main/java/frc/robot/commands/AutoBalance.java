@@ -17,6 +17,7 @@ public class AutoBalance extends CommandBase {
         this.arm = arm;
         // this.movement = new RollingAverage(2);
         autoBalance = new autoBalance(drivetrain);
+        addRequirements(drivetrain);
     }
 
     @Override

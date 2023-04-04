@@ -67,7 +67,7 @@ public class AutonUtils {
                 return TrajectoryGenerator.generateTrajectory(
                         startingPose,
                         List.of(),
-                        new Pose2d(Units.feetToMeters(0), Units.feetToMeters(13.5), startingPose.getRotation()),
+                        new Pose2d(Units.feetToMeters(0), Units.feetToMeters(10.5), startingPose.getRotation()),
                         AutoConstants.trajectoryConfig);
             default:
                 return null;

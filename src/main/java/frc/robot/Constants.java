@@ -31,7 +31,7 @@ public final class Constants {
 
   public static class DriveConstants {
 
-    public static final boolean useVisionBasedOdemetryEstimation = true;
+    public static final boolean useVisionBasedOdemetryEstimation = false;
 
     public static final int floorBrakeChannel = 5;
 
@@ -114,8 +114,8 @@ public final class Constants {
     public static final double verticalRange = 200; // Encoder position gets reset when the vertical motor hits the high limit
     public static final double horizontalRange = 230; // Encoder position gets reset when the horizontal motor hits the far limit
 
-    public static final double vertBangBangSpeed = 0.75;    // Vert Arm Speed
-    public static final double horizBangBangSpeed = 0.75;   // Horz Arm Speed
+    public static final double vertBangBangSpeed = 0.95;    // Vert Arm Speed
+    public static final double horizBangBangSpeed = 0.95;   // Horz Arm Speed
 
     public static final double horizontalPIDTolerance = 5;
     public static final double verticalPIDTolerance = 5;
